@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'dart:convert';
 
 void main() => runApp(MyApp());
 
@@ -61,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       subtitle: Text('$luz lm/W'),
                       leading: Icon(
                         Icons.lightbulb_outline,
-                        color: Colors.blue[500],
+                        color: Colors.yellow,
                       ),
                     ),
                     const Divider(),
@@ -71,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       subtitle: Text('$temperatura °C'),
                       leading: Icon(
                         Icons.thermostat,
-                        color: Colors.blue[500],
+                        color: Colors.red,
                       ),
                     ),
                     const Divider(),
@@ -81,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       subtitle: Text('$pressao atm'),
                       leading: Icon(
                         Icons.landscape,
-                        color: Colors.blue[500],
+                        color: Colors.brown,
                       ),
                     ),
                     const Divider(),
