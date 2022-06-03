@@ -64,22 +64,22 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     const Divider(),
                     ListTile(
-                      title: const Text('Temperatura',
-                          style: TextStyle(fontWeight: FontWeight.w500)),
-                      subtitle: Text('$temperatura °C'),
-                      leading: Icon(
-                        Icons.thermostat,
-                        color: Colors.red,
-                      ),
-                    ),
-                    const Divider(),
-                    ListTile(
                       title: const Text('Pressão Atmosférica',
                           style: TextStyle(fontWeight: FontWeight.w500)),
                       subtitle: Text('$pressao atm'),
                       leading: Icon(
                         Icons.landscape,
                         color: Colors.brown,
+                      ),
+                    ),
+                    const Divider(),
+                    ListTile(
+                      title: const Text('Temperatura',
+                          style: TextStyle(fontWeight: FontWeight.w500)),
+                      subtitle: Text('$temperatura °C'),
+                      leading: Icon(
+                        Icons.thermostat,
+                        color: Colors.red,
                       ),
                     ),
                     const Divider(),
