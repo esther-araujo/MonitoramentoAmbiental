@@ -64,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     const Divider(),
                     ListTile(
-                      title: const Text('Temperatura:',
+                      title: const Text('Temperatura',
                           style: TextStyle(fontWeight: FontWeight.w500)),
                       subtitle: Text('$temperatura °C'),
                       leading: Icon(
@@ -74,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     const Divider(),
                     ListTile(
-                      title: const Text('Pressão Atmosférica:',
+                      title: const Text('Pressão Atmosférica',
                           style: TextStyle(fontWeight: FontWeight.w500)),
                       subtitle: Text('$pressao atm'),
                       leading: Icon(
@@ -84,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     const Divider(),
                     ListTile(
-                      title: const Text('Umidade:',
+                      title: const Text('Umidade',
                           style: TextStyle(fontWeight: FontWeight.w500)),
                       subtitle: Text('$umidade %'),
                       leading: Icon(
