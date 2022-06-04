@@ -5,18 +5,19 @@
 #include <stdio.h>
 #include <string.h>
 #include <MQTTClient.h>
-
+// Definir local da biblioteca paho-mqtt3c quando rodar no raspberry
+// gcc -o teste testemqtt.c -lpaho-mqtt3c -L ~/Documents/g01/paho.mqtt.c/build/output
 /*
 * Defines
 */
 /* Caso desejar utilizar outro broker MQTT, substitua o endereco abaixo */
-#define MQTT_ADDRESS   "tcp://iot.eclipse.org"
+#define MQTT_ADDRESS   "brokermqttdashboard:1883"
 /* Substitua este por um ID unico em sua aplicacao */
-#define CLIENTID       "MQTTCClientID"  
+#define CLIENTID       "clientId-tD4ZvgsSvU"  
 
-/* Substitua aqui os topicos de publish e subscribe por topicos exclusivos de sua aplicacao */
-#define MQTT_PUBLISH_TOPIC     "MQTTCClientPubTopic"
-#define MQTT_SUBSCRIBE_TOPIC   "MQTTCClientSubTopic"
+/* Substituir pelos tópicos do laboratorio */
+#define MQTT_PUBLISH_TOPIC     "PBL/3"
+#define MQTT_SUBSCRIBE_TOPIC   "PBL/3"
 
 /*
 *  Variaveis globais
