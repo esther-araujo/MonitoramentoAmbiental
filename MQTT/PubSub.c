@@ -1,43 +1,26 @@
-/*
-* Includes
-*/
+/* Pro RPi
+ * $ gcc -o teste testemqtt.c -lpaho-mqtt3c -L ~/Documents/g01/paho.mqtt.c/build/output
+ */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+//Biblioteca paho.mqtt.c
 #include <MQTTClient.h>
-// Definir local da biblioteca paho-mqtt3c quando rodar no raspberry
-// gcc -o teste testemqtt.c -lpaho-mqtt3c -L ~/Documents/g01/paho.mqtt.c/build/output
-/*
-* Defines
-*/
-/* Caso desejar utilizar outro broker MQTT, substitua o endereco abaixo */
-#define MQTT_ADDRESS   "brokermqttdashboard:1883"
-/* Substitua este por um ID unico em sua aplicacao */
-#define CLIENTID       "clientId-tD4ZvgsSvU"  
 
-/* Substituir pelos tópicos do laboratorio */
-#define MQTT_PUBLISH_TOPIC     "PBL/3"
-#define MQTT_SUBSCRIBE_TOPIC   "PBL/3"
+//Teste com o mosquitto.org
+#define MQTT_ADDRESS   "127.0.0.1:1883"
+#define CLIENTID       "clientID"  
 
-/*
-*  Variaveis globais
-*/
+/*Topicos de publish e subscribe*/
+#define MQTT_PUBLISH_TOPIC     "PBL3/PublishTopic"
+#define MQTT_SUBSCRIBE_TOPIC   "PBL3/SubscribeTopic"
+
 MQTTClient client;
 
-/*
-* Prototipos de funcao
-*/
 void publish(MQTTClient client, char* topic, char* payload);
 int on_message(void *context, char *topicName, int topicLen, MQTTClient_message *message);
 
-/*
-* Implementacoes
-*/
-
-/* Funcao: publicacao de mensagens MQTT
- * Parametros: cleinte MQTT, topico MQTT and payload
- * Retorno: nenhum
-*/
+//Publisher de mensagens MQTT
 void publish(MQTTClient client, char* topic, char* payload) {
     MQTTClient_message pubmsg = MQTTClient_message_initializer;
 
@@ -50,18 +33,11 @@ void publish(MQTTClient client, char* topic, char* payload) {
     MQTTClient_waitForCompletion(client, token, 1000L);
 }
 
-/* Funcao: callback de mensagens MQTT recebidas e echo para o broker
- * Parametros: contexto, ponteiro para nome do topico da mensagem recebida, tamanho do nome do topico e mensagem recebida
- * Retorno : 1: sucesso (fixo / nao ha checagem de erro neste exemplo)
-*/
+//Callback de mensagens MQTT recebidas
 int on_message(void *context, char *topicName, int topicLen, MQTTClient_message *message) {
     char* payload = message->payload;
 
-    /* Mostra a mensagem recebida */
     printf("Mensagem recebida! \n\rTopico: %s Mensagem: %s\n", topicName, payload);
-
-    /* Faz echo da mensagem recebida */
-    publish(client, MQTT_PUBLISH_TOPIC, payload);
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topicName);
@@ -72,7 +48,8 @@ int main(int argc, char *argv[])
 {
    int rc;
    MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
-
+   conn_opts.keepAliveInterval = 10;
+   conn_opts.cleansession = 1;
    /* Inicializacao do MQTT (conexao & subscribe) */
    MQTTClient_create(&client, MQTT_ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
    MQTTClient_setCallbacks(client, NULL, NULL, on_message, NULL);
@@ -84,15 +61,13 @@ int main(int argc, char *argv[])
        printf("\n\rFalha na conexao ao broker MQTT. Erro: %d\n", rc);
        exit(-1);
    }
-
+   //Inscrevendo
    MQTTClient_subscribe(client, MQTT_SUBSCRIBE_TOPIC, 0);
+   
 
    while(1)
    {
-       /*
-        * o exemplo opera por "interrupcao" no callback de recepcao de 
-        * mensagens MQTT. Portanto, neste laco principal eh preciso fazer
-        * nada.
-        */
+        //Publicando
+        publish(client, MQTT_PUBLISH_TOPIC, "teste");
    }
 }
