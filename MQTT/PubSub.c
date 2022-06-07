@@ -1,5 +1,5 @@
 /* Pro RPi
- * $ gcc -o teste testemqtt.c -lpaho-mqtt3c -L ~/Documents/g01/paho.mqtt.c/build/output
+ * $ gcc -o file_name file_name.c -lpaho-mqtt3c -L ~/Documents/g01/paho.mqtt.c/build/output
  */
 #include <stdlib.h>
 #include <stdio.h>
