@@ -4,16 +4,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 //Biblioteca paho.mqtt.c
 #include <MQTTClient.h>
 
 //Teste com o mosquitto.org
-#define MQTT_ADDRESS   "127.0.0.1:1883"
+#define MQTT_ADDRESS   "10.0.0.101"
 #define CLIENTID       "clientID"  
 
 /*Topicos de publish e subscribe*/
-#define MQTT_PUBLISH_TOPIC     "PBL3/PublishTopic"
-#define MQTT_SUBSCRIBE_TOPIC   "PBL3/SubscribeTopic"
+#define MQTT_PUBLISH_TOPIC     "PBL3/teste"
+#define MQTT_SUBSCRIBE_TOPIC   "PBL3/teste"
+//Passar por parâmetro
+#define USERNAME "aluno"
+#define PASSWORD "aluno*123"
 
 MQTTClient client;
 
@@ -50,6 +54,8 @@ int main(int argc, char *argv[])
    MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
    conn_opts.keepAliveInterval = 10;
    conn_opts.cleansession = 1;
+   conn_opts.username = USERNAME;
+   conn_opts.password = PASSWORD;
    /* Inicializacao do MQTT (conexao & subscribe) */
    MQTTClient_create(&client, MQTT_ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
    MQTTClient_setCallbacks(client, NULL, NULL, on_message, NULL);
@@ -69,5 +75,7 @@ int main(int argc, char *argv[])
    {
         //Publicando
         publish(client, MQTT_PUBLISH_TOPIC, "teste");
+        sleep(5000);
+        
    }
 }
