@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:async';
+import 'package:mqtt_client/mqtt_client.dart';
+import 'dart:io';
+import 'package:mqtt_client/mqtt_server_client.dart';
+
+var pongCount = 0; // Pong counter
 
 void main() {
   runApp(
@@ -213,10 +219,8 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
       child: Opacity(
         opacity: 0.2,
         child: SvgPicture.asset('svg/Raspberry_Pi_Logo.svg',
-      fit: BoxFit.scaleDown
-         ),
+            fit: BoxFit.scaleDown),
       ),
-      
     );
   }
 
@@ -304,15 +308,35 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+double luz = 0;
+double temperatura = 0;
+double umidade = 0;
+double pressao = 0;
+
+final client = MqttServerClient('test.mosquitto.org', '');
+
 class _MyHomePageState extends State<MyHomePage> {
-  int luz = 0;
-  int temperatura = 0;
-  int umidade = 0;
-  int pressao = 0;
+  String broker = 'test.mosquitto.org';
+  int port = 1883;
+  String clientIdentifier = 'android';
+
+  late StreamSubscription subscription;
+
+  void _subscribeToTopic(String topic) {
+    if (client.connectionStatus!.state == MqttConnectionState.connected) {
+      print('[MQTT client] Subscribing to ${topic.trim()}');
+      client.subscribe(topic, MqttQos.exactlyOnce);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: _connect,
+        tooltip: 'Play',
+        child: Icon(Icons.play_arrow),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -369,5 +393,101 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  void _connect() async {
+    client.logging(on: false);
+
+    client.setProtocolV311();
+
+    client.keepAlivePeriod = 20;
+
+    client.onDisconnected = onDisconnected;
+
+    client.onConnected = onConnected;
+
+    client.onSubscribed = onSubscribed;
+
+    client.pongCallback = pong;
+
+    final connMess = MqttConnectMessage()
+        .withClientIdentifier('Mqtt_MyClientUniqueId')
+        .withWillTopic(
+            'willtopic') // If you set this you must set a will message
+        .withWillMessage('My Will message')
+        .startClean() // Non persistent session for testing
+        .withWillQos(MqttQos.atLeastOnce);
+    print('EXAMPLE::Mosquitto client connecting....');
+    client.connectionMessage = connMess;
+
+    try {
+      await client.connect();
+    } catch (e) {
+      print(e);
+      client.disconnect();
+    }
+
+    if (client.connectionStatus!.state == MqttConnectionState.connected) {
+      print('EXAMPLE::Mosquitto client connected');
+    } else {
+      /// Use status here rather than state if you also want the broker return code.
+      print(
+          'EXAMPLE::ERROR Mosquitto client connection failed - disconnecting, status is ${client.connectionStatus}');
+      client.disconnect();
+    }
+
+    /// Ok, lets try a subscription
+    const topic = 'temp/PBL3'; // Not a wildcard topic
+    client.subscribe(topic, MqttQos.atMostOnce);
+
+    client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
+      final recMess = c![0].payload as MqttPublishMessage;
+      final pt =
+          MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+
+      /// The above may seem a little convoluted for users only interested in the
+      /// payload, some users however may be interested in the received publish message,
+      /// lets not constrain ourselves yet until the package has been in the wild
+      /// for a while.
+      /// The payload is a byte buffer, this will be specific to the topic
+       setState(() {
+      temperatura = double.parse(pt);
+    });
+      print(pt);
+    });
+  }
+
+  void onSubscribed(String topic) {
+    print('EXAMPLE::Subscription confirmed for topic $topic');
+  }
+
+  /// The unsolicited disconnect callback
+  void onDisconnected() {
+    print('EXAMPLE::OnDisconnected client callback - Client disconnection');
+    if (client.connectionStatus!.disconnectionOrigin ==
+        MqttDisconnectionOrigin.solicited) {
+      print('EXAMPLE::OnDisconnected callback is solicited, this is correct');
+    } else {
+      print(
+          'EXAMPLE::OnDisconnected callback is unsolicited or none, this is incorrect - exiting');
+      exit(-1);
+    }
+    if (pongCount == 3) {
+      print('EXAMPLE:: Pong count is correct');
+    } else {
+      print('EXAMPLE:: Pong count is incorrect, expected 3. actual $pongCount');
+    }
+  }
+
+  /// The successful connect callback
+  void onConnected() {
+    print(
+        'EXAMPLE::OnConnected client callback - Client connection was successful');
+  }
+
+  /// Pong callback
+  void pong() {
+    print('EXAMPLE::Ping response client callback invoked');
+    pongCount++;
   }
 }
