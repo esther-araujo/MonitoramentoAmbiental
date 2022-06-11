@@ -1,387 +1,214 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'dart:async';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'dart:io';
 import 'package:mqtt_client/mqtt_server_client.dart';
-
-var pongCount = 0; // Pong counter
+import 'package:easy_sidemenu/easy_sidemenu.dart';
 
 void main() {
-  runApp(
-    const MaterialApp(
-      home: ExampleStaggeredAnimations(),
-      debugShowCheckedModeBanner: false,
-    ),
-  );
+  runApp(const MyApp());
 }
 
-class ExampleStaggeredAnimations extends StatefulWidget {
-  const ExampleStaggeredAnimations({
-    super.key,
-  });
-
-  @override
-  _ExampleStaggeredAnimationsState createState() =>
-      _ExampleStaggeredAnimationsState();
-}
-
-class _ExampleStaggeredAnimationsState extends State<ExampleStaggeredAnimations>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _drawerSlideController;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _drawerSlideController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 150),
-    );
-  }
-
-  @override
-  void dispose() {
-    _drawerSlideController.dispose();
-    super.dispose();
-  }
-
-  bool _isDrawerOpen() {
-    return _drawerSlideController.value == 1.0;
-  }
-
-  bool _isDrawerOpening() {
-    return _drawerSlideController.status == AnimationStatus.forward;
-  }
-
-  bool _isDrawerClosed() {
-    return _drawerSlideController.value == 0.0;
-  }
-
-  void _toggleDrawer() {
-    if (_isDrawerOpen() || _isDrawerOpening()) {
-      _drawerSlideController.reverse();
-    } else {
-      _drawerSlideController.forward();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: _buildAppBar(),
-      body: Stack(
-        children: [
-          _buildContent(),
-          _buildDrawer(),
-        ],
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      title: const Text(
-        'Monitoramento',
-        style: TextStyle(
-          color: Colors.black,
-        ),
-      ),
-      backgroundColor: Colors.transparent,
-      elevation: 0.0,
-      automaticallyImplyLeading: false,
-      actions: [
-        AnimatedBuilder(
-          animation: _drawerSlideController,
-          builder: (context, child) {
-            return IconButton(
-              onPressed: _toggleDrawer,
-              icon: _isDrawerOpen() || _isDrawerOpening()
-                  ? const Icon(
-                      Icons.clear,
-                      color: Colors.black,
-                    )
-                  : const Icon(
-                      Icons.menu,
-                      color: Colors.black,
-                    ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildContent() {
-    return MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blueGrey,
-        ),
-        home: MyHomePage(title: 'Monitoramento'));
-  }
-
-  Widget _buildDrawer() {
-    return AnimatedBuilder(
-      animation: _drawerSlideController,
-      builder: (context, child) {
-        return FractionalTranslation(
-          translation: Offset(1.0 - _drawerSlideController.value, 0.0),
-          child: _isDrawerClosed() ? const SizedBox() : const Menu(),
-        );
-      },
-    );
-  }
-}
-
-class Menu extends StatefulWidget {
-  const Menu({super.key});
-
-  @override
-  _MenuState createState() => _MenuState();
-}
-
-class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
-  static const _menuTitles = ['Configurações', 'Histórico', 'Sensores'];
-
-  static const _initialDelayTime = Duration(milliseconds: 50);
-  static const _itemSlideTime = Duration(milliseconds: 250);
-  static const _staggerTime = Duration(milliseconds: 50);
-  static const _buttonDelayTime = Duration(milliseconds: 150);
-  static const _buttonTime = Duration(milliseconds: 500);
-  final _animationDuration = _initialDelayTime +
-      (_staggerTime * _menuTitles.length) +
-      _buttonDelayTime +
-      _buttonTime;
-
-  late AnimationController _staggeredController;
-  final List<Interval> _itemSlideIntervals = [];
-  late Interval _buttonInterval;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _createAnimationIntervals();
-
-    _staggeredController = AnimationController(
-      vsync: this,
-      duration: _animationDuration,
-    )..forward();
-  }
-
-  void _createAnimationIntervals() {
-    for (var i = 0; i < _menuTitles.length; ++i) {
-      final startTime = _initialDelayTime + (_staggerTime * i);
-      final endTime = startTime + _itemSlideTime;
-      _itemSlideIntervals.add(
-        Interval(
-          startTime.inMilliseconds / _animationDuration.inMilliseconds,
-          endTime.inMilliseconds / _animationDuration.inMilliseconds,
-        ),
-      );
-    }
-
-    final buttonStartTime =
-        Duration(milliseconds: (_menuTitles.length * 50)) + _buttonDelayTime;
-    final buttonEndTime = buttonStartTime + _buttonTime;
-    _buttonInterval = Interval(
-      buttonStartTime.inMilliseconds / _animationDuration.inMilliseconds,
-      buttonEndTime.inMilliseconds / _animationDuration.inMilliseconds,
-    );
-  }
-
-  @override
-  void dispose() {
-    _staggeredController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          _buildFlutterLogo(),
-          _buildContent(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFlutterLogo() {
-    return Positioned(
-      right: -300,
-      bottom: -250,
-      child: Opacity(
-        opacity: 0.2,
-        child: SvgPicture.asset('svg/Raspberry_Pi_Logo.svg',
-            fit: BoxFit.scaleDown),
-      ),
-    );
-  }
-
-  Widget _buildContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 16),
-        ..._buildListItems(),
-        const Spacer(),
-        _buildGetStartedButton(),
-      ],
-    );
-  }
-
-  List<Widget> _buildListItems() {
-    final listItems = <Widget>[];
-    for (var i = 0; i < _menuTitles.length; ++i) {
-      listItems.add(
-        AnimatedBuilder(
-          animation: _staggeredController,
-          builder: (context, child) {
-            final animationPercent = Curves.easeOut.transform(
-              _itemSlideIntervals[i].transform(_staggeredController.value),
-            );
-            final opacity = animationPercent;
-            final slideDistance = (1.0 - animationPercent) * 150;
-
-            return Opacity(
-              opacity: opacity,
-              child: Transform.translate(
-                offset: Offset(slideDistance, 0),
-                child: child,
-              ),
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 36.0, vertical: 16),
-            child: Text(
-              _menuTitles[i],
-              textAlign: TextAlign.left,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-    return listItems;
-  }
-
-  Widget _buildGetStartedButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: AnimatedBuilder(
-          animation: _staggeredController,
-          builder: (context, child) {
-            final animationPercent = Curves.elasticOut.transform(
-                _buttonInterval.transform(_staggeredController.value));
-            final opacity = animationPercent.clamp(0.0, 1.0);
-            final scale = (animationPercent * 0.5) + 0.5;
-
-            return Opacity(
-              opacity: opacity,
-              child: Transform.scale(
-                scale: scale,
-                child: child,
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  final String title;
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
+var pongCount = 0; // Pong counter
 double luz = 0;
 double temperatura = 0;
 double umidade = 0;
 double pressao = 0;
 String topicT = "medida/temperatura";
 String topicU = "medida/umidade";
-String topicP = "medida/luminosidade";
-String topicL = "medida/pressaoAtm";
-
+String topicP = "medida/pressaoAtm";
+String topicL = "medida/luminosidade";
 
 final client = MqttServerClient('test.mosquitto.org', '');
 
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Monitoramento',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(title: 'Monitoramento'),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
 class _MyHomePageState extends State<MyHomePage> {
+  PageController page = PageController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: _connect,
-        tooltip: 'Play',
-        child: Icon(Icons.play_arrow),
+      appBar: AppBar(
+        title: Text(widget.title),
+        centerTitle: true,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-              child: Card(
-                elevation: 20,
-                child: Column(
-                  children: [
-                    ListTile(
-                      title: const Text('Luminosidade',
-                          style: TextStyle(fontWeight: FontWeight.w500)),
-                      subtitle: Text('$luz lm/W'),
-                      leading: Icon(
-                        Icons.lightbulb_outline,
-                        color: Colors.yellow,
-                      ),
-                    ),
-                    const Divider(),
-                    ListTile(
-                      title: const Text('Pressão Atmosférica',
-                          style: TextStyle(fontWeight: FontWeight.w500)),
-                      subtitle: Text('$pressao atm'),
-                      leading: Icon(
-                        Icons.landscape,
-                        color: Colors.brown,
-                      ),
-                    ),
-                    const Divider(),
-                    ListTile(
-                      title: const Text('Temperatura',
-                          style: TextStyle(fontWeight: FontWeight.w500)),
-                      subtitle: Text('$temperatura °C'),
-                      leading: Icon(
-                        Icons.thermostat,
-                        color: Colors.red,
-                      ),
-                    ),
-                    const Divider(),
-                    ListTile(
-                      title: const Text('Umidade',
-                          style: TextStyle(fontWeight: FontWeight.w500)),
-                      subtitle: Text('$umidade %'),
-                      leading: Icon(
-                        Icons.water_drop,
-                        color: Colors.blue[500],
-                      ),
-                    )
-                  ],
+      body: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SideMenu(
+            controller: page,
+            style: SideMenuStyle(
+              displayMode: SideMenuDisplayMode.auto,
+              hoverColor: Colors.blue[100],
+              selectedColor: Colors.lightBlue,
+              selectedTitleTextStyle: const TextStyle(color: Colors.white),
+              selectedIconColor: Colors.white,
+            ),
+            title: Column(
+              children: [
+                ConstrainedBox(
+                    constraints: const BoxConstraints(
+                  maxHeight: 150,
+                  maxWidth: 150,
+                )),
+                const Divider(
+                  indent: 8.0,
+                  endIndent: 8.0,
                 ),
+              ],
+            ),
+            items: [
+              SideMenuItem(
+                priority: 0,
+                title: 'Sensores',
+                onTap: () {
+                  page.jumpToPage(0);
+                },
+                icon: const Icon(Icons.sensors),
               ),
-            )
-          ],
+              SideMenuItem(
+                priority: 1,
+                title: 'Histórico',
+                onTap: () {
+                  page.jumpToPage(1);
+                },
+                icon: const Icon(Icons.history),
+              ),
+              SideMenuItem(
+                priority: 4,
+                title: 'Configurações',
+                onTap: () {
+                  page.jumpToPage(4);
+                },
+                icon: const Icon(Icons.settings),
+              ),
+            ],
+          ),
+          Expanded(
+            child: PageView(
+              controller: page,
+              children: [
+                Container(
+                  color: Colors.white,
+                  child: _buildSensors(),
+                ),
+                Container(
+                  color: Colors.white,
+                  child: const Center(
+                    child: Text(
+                      'Histórico',
+                      style: TextStyle(fontSize: 35),
+                    ),
+                  ),
+                ),
+                Container(
+                  color: Colors.white,
+                  child: _buildConfig(),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSensors() {
+    return Scaffold(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          SizedBox(
+            child: Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    title: const Text('Luminosidade',
+                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    subtitle: Text('$luz lm/W'),
+                    leading: Icon(
+                      Icons.lightbulb_outline,
+                      color: Colors.yellow,
+                    ),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    title: const Text('Pressão Atmosférica',
+                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    subtitle: Text('$pressao atm'),
+                    leading: Icon(
+                      Icons.landscape,
+                      color: Colors.brown,
+                    ),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    title: const Text('Temperatura',
+                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    subtitle: Text('$temperatura °C'),
+                    leading: Icon(
+                      Icons.thermostat,
+                      color: Colors.red,
+                    ),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    title: const Text('Umidade',
+                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    subtitle: Text('$umidade %'),
+                    leading: Icon(
+                      Icons.water_drop,
+                      color: Colors.blue[500],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConfig() {
+    return MaterialApp(
+      home: Scaffold(
+        body: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return Column(
+              children: [
+                MyCustomForm(),
+                ElevatedButton(
+                  onPressed: _connect,
+                  child: const Text('Conectar'),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -440,15 +267,14 @@ class _MyHomePageState extends State<MyHomePage> {
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
       //identificando para qual tópico veio a mensagem para setar os valores na tela
       setState(() {
-        if(c[0].topic == topicT)
+        if (c[0].topic == topicT)
           temperatura = double.parse(pt);
-        else if(c[0].topic == topicP)
+        else if (c[0].topic == topicP)
           pressao = double.parse(pt);
-        else if(c[0].topic == topicU)
+        else if (c[0].topic == topicU)
           umidade = double.parse(pt);
         else
           luz = double.parse(pt);
-
       });
       //print(pt);
     });
@@ -486,5 +312,50 @@ class _MyHomePageState extends State<MyHomePage> {
   void pong() {
     print('EXAMPLE::Ping response client callback invoked');
     pongCount++;
+  }
+}
+
+class MyCustomForm extends StatelessWidget {
+  const MyCustomForm({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: const <Widget>[
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Host',
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Usuário',
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Senha',
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Tempo',
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
