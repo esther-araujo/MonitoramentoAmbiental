@@ -312,23 +312,15 @@ double luz = 0;
 double temperatura = 0;
 double umidade = 0;
 double pressao = 0;
+String topicT = "medida/temperatura";
+String topicU = "medida/umidade";
+String topicP = "medida/luminosidade";
+String topicL = "medida/pressaoAtm";
+
 
 final client = MqttServerClient('test.mosquitto.org', '');
 
 class _MyHomePageState extends State<MyHomePage> {
-  String broker = 'test.mosquitto.org';
-  int port = 1883;
-  String clientIdentifier = 'android';
-
-  late StreamSubscription subscription;
-
-  void _subscribeToTopic(String topic) {
-    if (client.connectionStatus!.state == MqttConnectionState.connected) {
-      print('[MQTT client] Subscribing to ${topic.trim()}');
-      client.subscribe(topic, MqttQos.exactlyOnce);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -436,24 +428,29 @@ class _MyHomePageState extends State<MyHomePage> {
       client.disconnect();
     }
 
-    /// Ok, lets try a subscription
-    const topic = 'temp/PBL3'; // Not a wildcard topic
+    //o # indica que a inscrição ocorre para todos os topicos dentro de medida/
+    const topic = 'medida/#';
+    // inscrição
     client.subscribe(topic, MqttQos.atMostOnce);
 
     client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
       final recMess = c![0].payload as MqttPublishMessage;
+
       final pt =
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+      //identificando para qual tópico veio a mensagem para setar os valores na tela
+      setState(() {
+        if(c[0].topic == topicT)
+          temperatura = double.parse(pt);
+        else if(c[0].topic == topicP)
+          pressao = double.parse(pt);
+        else if(c[0].topic == topicU)
+          umidade = double.parse(pt);
+        else
+          luz = double.parse(pt);
 
-      /// The above may seem a little convoluted for users only interested in the
-      /// payload, some users however may be interested in the received publish message,
-      /// lets not constrain ourselves yet until the package has been in the wild
-      /// for a while.
-      /// The payload is a byte buffer, this will be specific to the topic
-       setState(() {
-      temperatura = double.parse(pt);
-    });
-      print(pt);
+      });
+      //print(pt);
     });
   }
 
