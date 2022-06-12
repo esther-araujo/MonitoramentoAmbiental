@@ -2,6 +2,10 @@
 #include <string.h>
 #include <wiringPi.h>
 #include <lcd.h>
+#include "ads/ads1115_rpi.h"
+#include "ads/ads1115_rpi.c"
+#include "ads/ads1115.c"
+
 // list wiringPi-RPi pins $ gpio readall
 
 float temperatura, umidade, luminosidade, pressao;
@@ -20,27 +24,30 @@ int chaveTempo = 0;
 char menu2nivel = '*';
 char menu3nivel = '-';
 char menuOpcoes[3][32] = {
-        "1: Acompanhar em tempo real",
-        "2: Historico",
-        "3: Configurar   tempo"
-    };
+    "1: Acompanhar em tempo real",
+    "2: Historico",
+    "3: Configurar tempo"
+};
 
 void resetLcd(int lcd);
-void printMedicoes();
+void printMedidas();
 void menu();
 void proximo();
 void voltar();
 void confirmar();
+void updateMedidas();
 
 int main(){
     wiringPiSetup();
     lcd = lcdInit(2,16,4,6,31,26,27,28,29,0,0,0,0);
 
+    // chamada de funções para uso do ADS1115
+    config();
 
     temperatura=22.45;
     umidade= 84.6;
-    luminosidade=39.369;
-    pressao=14.233;
+    //luminosidade=39.369;
+    //pressao=14.233;
 
     temperaturaH[0] = temperatura;
     umidadeH[0] = umidade;
@@ -64,7 +71,7 @@ void resetLcd(int lcd){
     lcdPosition(lcd, 0, 0);
 }
 
-void printMedicoes(){
+void printMedidas(){
 
     resetLcd(lcd);
     lcdPrintf(lcd,"%.1f C | %.1f I", temperatura, luminosidade);
@@ -91,7 +98,8 @@ void menu(){
                 lcdPuts(lcd, menuOpcoes[menuPosicao]);
             }
             else if (menuLocalizacao == 1){
-                printMedicoes();
+                updateMedidas();
+                printMedidas();
             }
             else if (menuLocalizacao == 2){
                 printHistorico();
@@ -133,4 +141,9 @@ void voltar(){
         menuLocalizacao = 0;
     }
     change = 1;
+}
+
+void updateMedidas(){
+    luminosidade = getLuminosity();
+    pressao = getPressure();
 }
