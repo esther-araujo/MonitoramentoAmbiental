@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'dart:io';
@@ -9,16 +11,17 @@ void main() {
 }
 
 var pongCount = 0; // Pong counter
-double luz = 0;
-double temperatura = 0;
-double umidade = 0;
-double pressao = 0;
+String luz = '0';
+String temperatura = '0';
+String umidade = '0';
+String pressao = '0';
 String topicT = "medida/temperatura";
 String topicU = "medida/umidade";
 String topicP = "medida/pressaoAtm";
 String topicL = "medida/luminosidade";
+String broker = "10.0.0.101";
 
-final client = MqttServerClient('test.mosquitto.org', '');
+final client = MqttServerClient(broker, '');
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -148,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ListTile(
                     title: const Text('Luminosidade',
                         style: TextStyle(fontWeight: FontWeight.w500)),
-                    subtitle: Text('$luz lm/W'),
+                    subtitle: Text('$luz i'),
                     leading: Icon(
                       Icons.lightbulb_outline,
                       color: Colors.yellow,
@@ -238,8 +241,11 @@ class _MyHomePageState extends State<MyHomePage> {
     print('EXAMPLE::Mosquitto client connecting....');
     client.connectionMessage = connMess;
 
+    String username="aluno";
+    String password="aluno*123";
+
     try {
-      await client.connect();
+      await client.connect(username, password);
     } catch (e) {
       print(e);
       client.disconnect();
@@ -267,13 +273,13 @@ class _MyHomePageState extends State<MyHomePage> {
       //identificando para qual tópico veio a mensagem para setar os valores na tela
       setState(() {
         if (c[0].topic == topicT)
-          temperatura = double.parse(pt);
+          temperatura = pt;
         else if (c[0].topic == topicP)
-          pressao = double.parse(pt);
+          pressao = pt;
         else if (c[0].topic == topicU)
-          umidade = double.parse(pt);
+          umidade = pt;
         else
-          luz = double.parse(pt);
+          luz = pt;
       });
       //print(pt);
     });
@@ -343,14 +349,6 @@ class MyCustomForm extends StatelessWidget {
           child: TextField(
             decoration: InputDecoration(
               hintText: 'Senha',
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Tempo',
             ),
           ),
         ),
