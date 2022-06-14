@@ -20,6 +20,8 @@
 #define MQTT_PUBLISH_PRESSAO    "medida/pressaoAtm"
 #define MQTT_PUBLISH_LUMI    "medida/luminosidade"
 
+
+//#define MQTT_SUBSCRIBE_TOPIC   "PBL3/teste"
 //Passar por parâmetro
 #define USERNAME "aluno"
 #define PASSWORD "aluno*123"
@@ -57,7 +59,7 @@ int main(){
     // inicialização do sensor DHT11
     InitDHT(DHT11PIN);
 
-    char temp[5], umid[5], luz[5], pressaoAtm[5];
+    char temp[10], umid[10], luz[10], pressaoAtm[10];
     int read_dht;
 
 	while(1){
@@ -71,17 +73,14 @@ int main(){
 		sprintf(luz, "%.2f", luminosidade);
 		sprintf(pressaoAtm, "%.2f", pressao);
 		if(read_dht!=-1){
-		    mosquitto_publish(mosq, NULL, MQTT_PUBLISH_TEMP , 6, temp, 0, false);
-	    	mosquitto_publish(mosq, NULL, MQTT_PUBLISH_UMID , 6, umid, 0, false);
-	    	mosquitto_publish(mosq, NULL, MQTT_PUBLISH_PRESSAO , 6, pressaoAtm, 0, false);
-	    	mosquitto_publish(mosq, NULL, MQTT_PUBLISH_LUMI , 6, luz, 0, false);
+		    mosquitto_publish(mosq, NULL, MQTT_PUBLISH_TEMP , strlen(temp), temp, 0, false);
+	    	mosquitto_publish(mosq, NULL, MQTT_PUBLISH_UMID , strlen(umid), umid, 0, false);
+	    	mosquitto_publish(mosq, NULL, MQTT_PUBLISH_PRESSAO , strlen(pressaoAtm), pressaoAtm, 0, false);
+	    	mosquitto_publish(mosq, NULL, MQTT_PUBLISH_LUMI , strlen(luz), luz, 0, false);
 
 
 		}
 
-
-
-	    usleep(1000000);
 	}
 
 
