@@ -2,7 +2,14 @@
 #include <string.h>
 #include <wiringPi.h>
 #include <lcd.h>
+#include "ads/ads1115_rpi.h"
+#include "ads/ads1115_rpi.c"
+#include "ads/ads1115.c"
+#include "dht11/DHT11library.h"
+#include "dht11/DHT11library.c"
 // list wiringPi-RPi pins $ gpio readall
+
+#define DHT11PIN 4
 
 float temperatura, umidade, luminosidade, pressao;
 float temperaturaH[10], umidadeH[10], luminosidadeH[10], pressaoH[10];
@@ -20,32 +27,29 @@ int chaveTempo = 0;
 char menu2nivel = '*';
 char menu3nivel = '-';
 char menuOpcoes[3][32] = {
-        "1: Acompanhar em tempo real",
-        "2: Historico",
-        "3: Configurar   tempo"
-    };
+    "1: Acompanhar em tempo real",
+    "2: Historico",
+    "3: Configurar tempo"
+};
 
 void resetLcd(int lcd);
-void printMedicoes();
+void printMedidas();
 void menu();
 void proximo();
 void voltar();
 void confirmar();
+void updateMedidas();
+float mapValue(float value);
 
 int main(){
     wiringPiSetup();
     lcd = lcdInit(2,16,4,6,31,26,27,28,29,0,0,0,0);
 
+    // configuração do ADS1115 
+    configADS1115();
+    // inicialização do sensor DHT11
+    InitDHT(DHT11PIN);
 
-    temperatura=22.45;
-    umidade= 84.6;
-    luminosidade=39.369;
-    pressao=14.233;
-
-    temperaturaH[0] = temperatura;
-    umidadeH[0] = umidade;
-    luminosidadeH[0] = luminosidade;
-    pressaoH[0] = pressao;
     historicoQtd = 1;
 
 
@@ -64,7 +68,7 @@ void resetLcd(int lcd){
     lcdPosition(lcd, 0, 0);
 }
 
-void printMedicoes(){
+void printMedidas(){
 
     resetLcd(lcd);
     lcdPrintf(lcd,"%.1f C | %.1f I", temperatura, luminosidade);
@@ -91,7 +95,8 @@ void menu(){
                 lcdPuts(lcd, menuOpcoes[menuPosicao]);
             }
             else if (menuLocalizacao == 1){
-                printMedicoes();
+                updateMedidas();
+                printMedidas();
             }
             else if (menuLocalizacao == 2){
                 printHistorico();
@@ -133,4 +138,16 @@ void voltar(){
         menuLocalizacao = 0;
     }
     change = 1;
+}
+
+void updateMedidas(){
+    luminosidade = mapValue(getLuminosity());
+    pressao = mapValue(getPressure());
+    read_dht11_dat();
+    temperatura = getTemp();
+    umidade = getHumidity();
+}
+
+float mapValue(float value){
+    return (float) ((value * 255) / 3.3);
 }
