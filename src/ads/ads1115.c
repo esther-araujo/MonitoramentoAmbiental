@@ -14,7 +14,7 @@ float getLuminosity(){
     return readVoltage(0);
 } 
 
-int config(){
+int configADS1115(){
     if(openI2CBus("/dev/i2c-1") == -1) {
         return EXIT_FAILURE;
     }

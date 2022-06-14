@@ -5,8 +5,11 @@
 #include "ads/ads1115_rpi.h"
 #include "ads/ads1115_rpi.c"
 #include "ads/ads1115.c"
-
+#include "dht11/DHT11library.h"
+#include "dht11/DHT11library.c"
 // list wiringPi-RPi pins $ gpio readall
+
+#define DHT11PIN 4
 
 float temperatura, umidade, luminosidade, pressao;
 float temperaturaH[10], umidadeH[10], luminosidadeH[10], pressaoH[10];
@@ -36,23 +39,17 @@ void proximo();
 void voltar();
 void confirmar();
 void updateMedidas();
+float mapValue(float value);
 
 int main(){
     wiringPiSetup();
     lcd = lcdInit(2,16,4,6,31,26,27,28,29,0,0,0,0);
 
-    // chamada de funções para uso do ADS1115
-    config();
+    // configuração do ADS1115 
+    configADS1115();
+    // inicialização do sensor DHT11
+    InitDHT(DHT11PIN);
 
-    temperatura=22.45;
-    umidade= 84.6;
-    //luminosidade=39.369;
-    //pressao=14.233;
-
-    temperaturaH[0] = temperatura;
-    umidadeH[0] = umidade;
-    luminosidadeH[0] = luminosidade;
-    pressaoH[0] = pressao;
     historicoQtd = 1;
 
 
@@ -144,6 +141,13 @@ void voltar(){
 }
 
 void updateMedidas(){
-    luminosidade = getLuminosity();
-    pressao = getPressure();
+    luminosidade = mapValue(getLuminosity());
+    pressao = mapValue(getPressure());
+    read_dht11_dat();
+    temperatura = getTemp();
+    umidade = getHumidity();
+}
+
+float mapValue(float value){
+    return (float) ((value * 255) / 3.3);
 }
