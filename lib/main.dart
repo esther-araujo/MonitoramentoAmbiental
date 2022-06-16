@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'dart:io';
@@ -19,7 +17,10 @@ String topicT = "medida/temperatura";
 String topicU = "medida/umidade";
 String topicP = "medida/pressaoAtm";
 String topicL = "medida/luminosidade";
-String broker = "10.0.0.101";
+String broker = "";
+String username = "";
+String password = "";
+String response = "";
 
 final client = MqttServerClient(broker, '');
 
@@ -54,6 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(widget.title),
         centerTitle: true,
@@ -141,6 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildSensors() {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -199,11 +202,14 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildConfig() {
     return MaterialApp(
       home: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             return Column(
               children: [
                 MyCustomForm(),
+                Text(response,
+                    style: TextStyle(color: Color.fromARGB(255, 1, 77, 4))),
                 ElevatedButton(
                   onPressed: _connect,
                   child: const Text('Conectar'),
@@ -240,9 +246,6 @@ class _MyHomePageState extends State<MyHomePage> {
         .withWillQos(MqttQos.atLeastOnce);
     print('EXAMPLE::Mosquitto client connecting....');
     client.connectionMessage = connMess;
-
-    String username="aluno";
-    String password="aluno*123";
 
     try {
       await client.connect(username, password);
@@ -281,34 +284,26 @@ class _MyHomePageState extends State<MyHomePage> {
         else
           luz = pt;
       });
-      //print(pt);
     });
   }
 
   void onSubscribed(String topic) {
+    setState(() {});
     print('EXAMPLE::Subscription confirmed for topic $topic');
   }
 
   /// The unsolicited disconnect callback
   void onDisconnected() {
-    print('EXAMPLE::OnDisconnected client callback - Client disconnection');
-    if (client.connectionStatus!.disconnectionOrigin ==
-        MqttDisconnectionOrigin.solicited) {
-      print('EXAMPLE::OnDisconnected callback is solicited, this is correct');
-    } else {
-      print(
-          'EXAMPLE::OnDisconnected callback is unsolicited or none, this is incorrect - exiting');
-      exit(-1);
-    }
-    if (pongCount == 3) {
-      print('EXAMPLE:: Pong count is correct');
-    } else {
-      print('EXAMPLE:: Pong count is incorrect, expected 3. actual $pongCount');
-    }
+    setState(() {
+      response = "Desconectado do broker";
+    });
   }
 
   /// The successful connect callback
   void onConnected() {
+    setState(() {
+      response = "Conexão com broker ativa";
+    });
     print(
         'EXAMPLE::OnConnected client callback - Client connection was successful');
   }
@@ -327,13 +322,16 @@ class MyCustomForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: const <Widget>[
+      children: <Widget>[
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
           child: TextField(
             decoration: InputDecoration(
               hintText: 'Host',
             ),
+            onChanged: (newText) {
+              broker = newText;
+            },
           ),
         ),
         Padding(
@@ -342,6 +340,9 @@ class MyCustomForm extends StatelessWidget {
             decoration: InputDecoration(
               hintText: 'Usuário',
             ),
+            onChanged: (newText) {
+              username = newText;
+            },
           ),
         ),
         Padding(
@@ -350,6 +351,9 @@ class MyCustomForm extends StatelessWidget {
             decoration: InputDecoration(
               hintText: 'Senha',
             ),
+            onChanged: (newText) {
+              password = newText;
+            },
           ),
         ),
       ],
