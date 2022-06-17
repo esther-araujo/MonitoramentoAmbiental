@@ -21,7 +21,7 @@ int menuLocalizacao = 0;
 int menuPosicao = 0;
 int change = 1;
 
-int configTempo = 10;
+int configTempo = 1;
 int chaveTempo = 0;
 
 char menu2nivel = '*';
@@ -39,7 +39,17 @@ void proximo();
 void voltar();
 void confirmar();
 void updateMedidas();
-float mapValue(float value);
+void updateHistorico();
+float mapValue(float value, int max);
+
+PI_THREAD (medidasThread)
+{
+    while (1)
+    {
+        updateMedidas();
+        usleep(configTempo * 1000000);
+    }
+}
 
 int main(){
     wiringPiSetup();
@@ -50,15 +60,16 @@ int main(){
     // inicialização do sensor DHT11
     InitDHT(DHT11PIN);
 
-    historicoQtd = 1;
-
-
     wiringPiISR (21, INT_EDGE_FALLING, &voltar);//botão voltar
     wiringPiISR (24, INT_EDGE_FALLING, &proximo);//botão proximo
     wiringPiISR (25, INT_EDGE_FALLING, &confirmar);//botão confirmar
-
+    
+    int x = piThreadCreate(medidasThread);
+    if (x !=0 ){
+        printf("erro ao iniciar a thread.");
+    }
     menu();
-    //raspberry
+    
 
     return 0;
 }
@@ -120,7 +131,15 @@ void menu(){
 }
 
 void proximo(){
-    menuPosicao >= 2 ? menuPosicao = 0 : menuPosicao++;
+    if (menuLocalizacao == 2){
+        historicoIndex++;
+        if(historicoIndex >= historicoQtd ){
+            historicoIndex = 0;
+        }
+    }
+    else {
+        menuPosicao >= 2 ? menuPosicao = 0 : menuPosicao++;
+    }
     change = 1;
 }
 
@@ -141,13 +160,30 @@ void voltar(){
 }
 
 void updateMedidas(){
-    luminosidade = mapValue(getLuminosity());
-    pressao = mapValue(getPressure());
+    luminosidade = mapValue(getLuminosity(), 10);
+    pressao = mapValue(getPressure(), 100);
     read_dht11_dat();
     temperatura = getTemp();
     umidade = getHumidity();
+    updateHistorico();
+    change=1;
 }
 
-float mapValue(float value){
-    return (float) ((value * 255) / 3.3);
+void updateHistorico(){
+    for(int i=0;i<historicoQtd-1;i++){
+        temperaturaH[i+1] = temperaturaH[i];
+        umidadeH[i+1] = umidadeH[i];
+        pressaoH[i+1] = pressaoH[i];
+        luminosidadeH[i+1] = luminosidadeH[i];
+    }
+    temperaturaH[0] = temperatura; 
+    umidadeH[0] = umidade; 
+    pressaoH[0] = pressao; 
+    luminosidadeH[0] = luminosidade; 
+    if(historicoQtd < 10) 
+        historicoQtd++;
+}
+
+float mapValue(float value, int max){
+    return (float) ((value * max) / 3.3);
 }
