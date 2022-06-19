@@ -25,6 +25,7 @@
 #define MQTT_PUBLISH_HIST_UMID    "historico/umidade"
 #define MQTT_PUBLISH_HIST_PRESSAO    "historico/pressaoAtm"
 #define MQTT_PUBLISH_HIST_LUMI    "historico/luminosidade"
+#define MQTT_PUBLISH_TEMPO    "config/tempo"
 
 
 
@@ -43,10 +44,16 @@ int historicoQtd = 0;
 int lcd;
 int menuLocalizacao = 0;
 int menuPosicao = 0;
-int change = 1;
+int changeInterface = 1;
 
 int configTempo = 1;
 int chaveTempo = 0;
+// variaveis para armazenar o nivel logico das chaves que configuram o tempo
+int chaveT1 = 4;//esses são numeros na placa é necessario trocar para a numeração do wiringPi
+int chaveT2 = 17;
+int chaveT3 = 27;
+int chaveT4 = 22;
+//
 
 char menu2nivel = '*';
 char menu3nivel = '-';
@@ -69,6 +76,10 @@ void updateMedidas();
 void updateHistorico();
 float mapValue(float value, int max);
 void remoteUpdateMQTT();
+void updateConfigTempo();
+void updateChaveTempo();
+int getChaveTempo();
+void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message);
 
 
 PI_THREAD (medidasThread)
@@ -96,7 +107,6 @@ void remoteUpdateMQTT(){
         mosquitto_publish(mosq, NULL, MQTT_PUBLISH_UMID , strlen(umid), umid, 0, false);
         mosquitto_publish(mosq, NULL, MQTT_PUBLISH_PRESSAO , strlen(pressaoAtm), pressaoAtm, 0, false);
         mosquitto_publish(mosq, NULL, MQTT_PUBLISH_LUMI , strlen(luz), luz, 0, false);
-
     }
 
 }
@@ -114,6 +124,7 @@ int main(){
         mosquitto_destroy(mosq);
         return -1;
     }
+	mosquitto_message_callback_set(mosq, on_message);
     printf("We are now connected to the broker!\n");
     wiringPiSetup();
     lcd = lcdInit(2,16,4,6,31,26,27,28,29,0,0,0,0);
@@ -129,10 +140,10 @@ int main(){
     
     int x = piThreadCreate(medidasThread);
     if (x !=0 ){
-        printf("erro ao iniciar a thread.");
+        printf("Erro ao iniciar a thread.");
     }
+
     menu();
-    
 
     return 0;
 }
@@ -163,7 +174,7 @@ void menu(){
     char mensagemTempo2[32] = " ";
 
     while(1){
-        if(change){
+        if(changeInterface){
             if(menuLocalizacao == 0){
                 resetLcd(lcd);
                 lcdPuts(lcd, menuOpcoes[menuPosicao]);
@@ -176,7 +187,7 @@ void menu(){
             }
             else if (menuLocalizacao == 3){
                 strcat(mensagemTempo1, (char*) ('0'+configTempo) );
-                strcat(mensagemTempo1, "s");
+                strcat(mensagemTempo1, " s");
 
                 strcat(mensagemTempo2, (char*) ('0'+chaveTempo) );
                 strcat(mensagemTempo2, " s");
@@ -186,7 +197,7 @@ void menu(){
                 lcdPosition(lcd, 0, 1);
                 lcdPuts(lcd, mensagemTempo2);
             }
-            change = 0;
+            changeInterface = 0;
         }
     }
     
@@ -199,16 +210,24 @@ void proximo(){
             historicoIndex = 0;
         }
     }
-    else {
+    else if (menuLocalizacao == 0) {
         menuPosicao >= 2 ? menuPosicao = 0 : menuPosicao++;
     }
-    change = 1;
+    changeInterface = 1;
 }
 
 
 void confirmar(){
-    menuLocalizacao = menuPosicao+1;
-    change = 1;
+    if (menuLocalizacao == 0) {
+        menuLocalizacao = menuPosicao+1;
+    }
+    else if (menuLocalizacao == 1) {// 
+        updateMedidas();//quando estiver exibindo as medidas atuais o botão confirmar força a atualização das medidas
+    }
+    else if (menuLocalizacao == 3) {
+        updateConfigTempo();//confirma a atualização do tempo e publica a mesma no topico MQTT
+    }
+    changeInterface = 1;
 }
 
 void voltar(){
@@ -218,7 +237,7 @@ void voltar(){
     else {
         menuLocalizacao = 0;
     }
-    change = 1;
+    changeInterface = 1;
 }
 
 void updateMedidas(){
@@ -228,7 +247,7 @@ void updateMedidas(){
     temperatura = getTemp();
     umidade = getHumidity();
     updateHistorico();
-    change=1;
+    changeInterface =1;
 }
 
 void updateHistorico(){
@@ -244,6 +263,45 @@ void updateHistorico(){
     luminosidadeH[0] = luminosidade; 
     if(historicoQtd < 10) 
         historicoQtd++;
+}
+
+void updateConfigTempo(){
+    char charTempo[4];
+
+    configTempo = chaveTempo;
+    changeInterface = 1;
+
+    sprintf(charTempo, "%d", configTempo);
+    mosquitto_publish(mosq, NULL, MQTT_PUBLISH_TEMPO , strlen(charTempo), charTempo, 0, false);
+}
+
+void updateChaveTempo(){
+    chaveTempo = getChaveTempo();
+    changeInterface = 1;
+}
+
+int getChaveTempo(){
+    if(digitalRead(chaveT4)){
+        return 100;
+    }
+    if(digitalRead(chaveT3)){
+        return 80;
+    }
+    if(digitalRead(chaveT2)){
+        return 60;
+    }
+    if(digitalRead(chaveT1)){
+        return 40;
+    }
+    return 20;
+}
+
+void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg) {
+	printf("Nova mensagem\n %s: %s\n", msg->topic, (char *) msg->payload);
+    if( strcmp(msg->topic, MQTT_PUBLISH_TEMPO) == 0 ){
+        chaveTempo = atoi(msg->payload);
+        changeInterface = 1;
+    }
 }
 
 float mapValue(float value, int max){
