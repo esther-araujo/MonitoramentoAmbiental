@@ -9,6 +9,11 @@ void main() {
 }
 
 var pongCount = 0; // Pong counter
+var historicoL = [];
+var historicoT = [];
+var historicoU = [];
+var historicoP = [];
+int indexHistorico = 0;
 String luz = '0';
 String temperatura = '0';
 String umidade = '0';
@@ -315,6 +320,12 @@ class _MyHomePageState extends State<MyHomePage> {
           luz = pt;
         }
       });
+      updateHistoric();
+      //imprime as listas com historico das medidas para teste
+      print(historicoL);
+      print(historicoU);
+      print(historicoT);
+      print(historicoP);
     });
   }
 
@@ -343,6 +354,22 @@ class _MyHomePageState extends State<MyHomePage> {
   void pong() {
     print('EXAMPLE::Ping response client callback invoked');
     pongCount++;
+  }
+
+  void updateHistoric() {
+    if (historicoL.length < 10) {
+      historicoL.add(luz);
+      historicoT.add(temperatura);
+      historicoU.add(umidade);
+      historicoP.add(pressao);
+    } else {
+      historicoL[indexHistorico] = luz;
+      historicoT[indexHistorico] = temperatura;
+      historicoU[indexHistorico] = umidade;
+      historicoP[indexHistorico] = pressao;
+      indexHistorico++;
+      if (indexHistorico == 10) indexHistorico = 0;
+    }
   }
 }
 
