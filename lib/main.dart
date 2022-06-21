@@ -122,12 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 Container(
                   color: Colors.white,
-                  child: const Center(
-                    child: Text(
-                      'Histórico',
-                      style: TextStyle(fontSize: 35),
-                    ),
-                  ),
+                  child: _buildHist(),
                 ),
                 Container(
                   color: Colors.white,
@@ -136,6 +131,41 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  List<String> dataList = ['1', '2'];
+
+  Widget _buildHist() {
+    return Scaffold(
+      body: Row(
+        children: <Widget>[
+          Expanded(
+              child: ListView.builder(
+                  itemCount: 2,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(title: Text(dataList[index]));
+                  })),
+          Expanded(
+              child: ListView.builder(
+                  itemCount: 2,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(title: Text(dataList[index]));
+                  })),
+          Expanded(
+              child: ListView.builder(
+                  itemCount: 2,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(title: Text(dataList[index]));
+                  })),
+          Expanded(
+              child: ListView.builder(
+                  itemCount: 2,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(title: Text(dataList[index]));
+                  })),
         ],
       ),
     );
@@ -275,14 +305,15 @@ class _MyHomePageState extends State<MyHomePage> {
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
       //identificando para qual tópico veio a mensagem para setar os valores na tela
       setState(() {
-        if (c[0].topic == topicT)
+        if (c[0].topic == topicT) {
           temperatura = pt;
-        else if (c[0].topic == topicP)
+        } else if (c[0].topic == topicP) {
           pressao = pt;
-        else if (c[0].topic == topicU)
+        } else if (c[0].topic == topicU) {
           umidade = pt;
-        else
+        } else {
           luz = pt;
+        }
       });
     });
   }
