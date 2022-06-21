@@ -49,10 +49,11 @@ int changeInterface = 1;
 int configTempo = 1;
 int chaveTempo = 0;
 // variaveis para armazenar o nivel logico das chaves que configuram o tempo
-int chaveT1 = 4;//esses são numeros na placa é necessario trocar para a numeração do wiringPi
-int chaveT2 = 17;
-int chaveT3 = 27;
-int chaveT4 = 22;
+//4 17 27 22 - esses são numeros na placa é necessario trocar para a numeração do wiringPi
+int chaveT1 = 7;
+int chaveT2 = 0;
+int chaveT3 = 2;
+int chaveT4 = 3;
 //
 
 char menu2nivel = '*';
@@ -186,12 +187,8 @@ void menu(){
                 printHistorico();
             }
             else if (menuLocalizacao == 3){
-                strcat(mensagemTempo1, (char*) ('0'+configTempo) );
-                strcat(mensagemTempo1, " s");
-
-                strcat(mensagemTempo2, (char*) ('0'+chaveTempo) );
-                strcat(mensagemTempo2, " s");
-
+                updateChaveTempo();
+                sprintf(mensagemTempo2, "%d %c", chaveTempo, 's');
                 resetLcd(lcd);
                 lcdPuts(lcd, mensagemTempo1);
                 lcdPosition(lcd, 0, 1);
