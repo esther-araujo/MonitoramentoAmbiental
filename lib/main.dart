@@ -141,35 +141,33 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  List<String> dataList = ['1', '2'];
-
   Widget _buildHist() {
     return Scaffold(
       body: Row(
         children: <Widget>[
           Expanded(
               child: ListView.builder(
-                  itemCount: 2,
+                  itemCount: historicoL.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return ListTile(title: Text(dataList[index]));
+                    return ListTile(title: Text(historicoL[index]));
                   })),
           Expanded(
               child: ListView.builder(
-                  itemCount: 2,
+                  itemCount: historicoP.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return ListTile(title: Text(dataList[index]));
+                    return ListTile(title: Text(historicoP[index]));
                   })),
           Expanded(
               child: ListView.builder(
-                  itemCount: 2,
+                  itemCount: historicoT.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return ListTile(title: Text(dataList[index]));
+                    return ListTile(title: Text(historicoT[index]));
                   })),
           Expanded(
               child: ListView.builder(
-                  itemCount: 2,
+                  itemCount: historicoU.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return ListTile(title: Text(dataList[index]));
+                    return ListTile(title: Text(historicoU[index]));
                   })),
         ],
       ),
