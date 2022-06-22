@@ -34,7 +34,7 @@
 #define USERNAME "aluno"
 #define PASSWORD "aluno*123"
 
-#define DHT11PIN 4
+#define DHT11PIN 5
 
 float temperatura, umidade, luminosidade, pressao;
 float temperaturaH[10], umidadeH[10], luminosidadeH[10], pressaoH[10];
@@ -138,7 +138,11 @@ int main(){
     wiringPiISR (21, INT_EDGE_FALLING, &voltar);//botão voltar
     wiringPiISR (24, INT_EDGE_FALLING, &proximo);//botão proximo
     wiringPiISR (25, INT_EDGE_FALLING, &confirmar);//botão confirmar
-    
+    wiringPiISR (chaveT1, INT_EDGE_BOTH, &updateChaveTempo);
+    wiringPiISR (chaveT2, INT_EDGE_BOTH, &updateChaveTempo);
+    wiringPiISR (chaveT3, INT_EDGE_BOTH, &updateChaveTempo);
+    wiringPiISR (chaveT4, INT_EDGE_BOTH, &updateChaveTempo);
+
     int x = piThreadCreate(medidasThread);
     if (x !=0 ){
         printf("Erro ao iniciar a thread.");
@@ -171,8 +175,8 @@ void printHistorico(){
 }
 
 void menu(){
-    char mensagemTempo1[32] = "Tempo salvo: ";
-    char mensagemTempo2[32] = " ";
+    char mensagemTempo1[16] = "";
+    char mensagemTempo2[16] = "";
 
     while(1){
         if(changeInterface){
@@ -188,7 +192,8 @@ void menu(){
             }
             else if (menuLocalizacao == 3){
                 updateChaveTempo();
-                sprintf(mensagemTempo2, "%d %c", chaveTempo, 's');
+                sprintf(mensagemTempo1, "Atual: %d s", configTempo);
+                sprintf(mensagemTempo2, "Chave: %d s", chaveTempo);
                 resetLcd(lcd);
                 lcdPuts(lcd, mensagemTempo1);
                 lcdPosition(lcd, 0, 1);
@@ -278,16 +283,16 @@ void updateChaveTempo(){
 }
 
 int getChaveTempo(){
-    if(digitalRead(chaveT4)){
+    if(!digitalRead(chaveT4)){
         return 100;
     }
-    if(digitalRead(chaveT3)){
+    if(!digitalRead(chaveT3)){
         return 80;
     }
-    if(digitalRead(chaveT2)){
+    if(!digitalRead(chaveT2)){
         return 60;
     }
-    if(digitalRead(chaveT1)){
+    if(!digitalRead(chaveT1)){
         return 40;
     }
     return 20;
