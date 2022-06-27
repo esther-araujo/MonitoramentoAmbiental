@@ -153,23 +153,21 @@ class _MyHomePageState extends State<MyHomePage> {
                       return Column(
                         children: [
                           // The header
-                          Container(
-                            child: Text('Luminosidade (i)',
-                                style: TextStyle(fontWeight: FontWeight.w500)),
-                          ),
+                          Container(child: const Text('L (i)')),
 
                           // The fist list item
                           ListTile(
                               title: Text(historicoL[index],
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w500)))
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                  textAlign: TextAlign.center))
                         ],
                       );
                     }
                     // If index != 0
                     return ListTile(
                         title: Text(historicoL[index],
-                            style: TextStyle(fontWeight: FontWeight.w500)));
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                            textAlign: TextAlign.center));
                   })),
           Expanded(
               child: ListView.builder(
@@ -180,22 +178,23 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           // The header
                           Container(
-                            child: Text('Pressão Atmosférica (atm)',
+                            child: const Text('PA (atm)',
                                 style: TextStyle(fontWeight: FontWeight.w500)),
                           ),
 
                           // The fist list item
                           ListTile(
                               title: Text(historicoP[index],
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w500)))
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                  textAlign: TextAlign.center))
                         ],
                       );
                     }
                     // If index != 0
                     return ListTile(
                         title: Text(historicoL[index],
-                            style: TextStyle(fontWeight: FontWeight.w500)));
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                            textAlign: TextAlign.center));
                   })),
           Expanded(
               child: ListView.builder(
@@ -206,22 +205,23 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           // The header
                           Container(
-                            child: Text('Temperatura (°C)',
+                            child: const Text('T (°C)',
                                 style: TextStyle(fontWeight: FontWeight.w500)),
                           ),
 
                           // The fist list item
                           ListTile(
                               title: Text(historicoT[index],
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w500)))
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                  textAlign: TextAlign.center))
                         ],
                       );
                     }
                     // If index != 0
                     return ListTile(
                         title: Text(historicoT[index],
-                            style: TextStyle(fontWeight: FontWeight.w500)));
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                            textAlign: TextAlign.center));
                   })),
           Expanded(
               child: ListView.builder(
@@ -232,22 +232,23 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           // The header
                           Container(
-                            child: Text('Umidade (%)',
+                            child: const Text('U (%)',
                                 style: TextStyle(fontWeight: FontWeight.w500)),
                           ),
 
                           // The fist list item
                           ListTile(
                               title: Text(historicoU[index],
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w500)))
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                  textAlign: TextAlign.center))
                         ],
                       );
                     }
                     // If index != 0
                     return ListTile(
                         title: Text(historicoU[index],
-                            style: TextStyle(fontWeight: FontWeight.w500)));
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                            textAlign: TextAlign.center));
                   })),
         ],
       ),
