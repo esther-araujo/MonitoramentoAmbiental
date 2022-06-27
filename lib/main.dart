@@ -149,25 +149,105 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ListView.builder(
                   itemCount: historicoL.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return ListTile(title: Text(historicoL[index]));
+                    if (index == 0) {
+                      return Column(
+                        children: [
+                          // The header
+                          Container(
+                            child: Text('Luminosidade (i)',
+                                style: TextStyle(fontWeight: FontWeight.w500)),
+                          ),
+
+                          // The fist list item
+                          ListTile(
+                              title: Text(historicoL[index],
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w500)))
+                        ],
+                      );
+                    }
+                    // If index != 0
+                    return ListTile(
+                        title: Text(historicoL[index],
+                            style: TextStyle(fontWeight: FontWeight.w500)));
                   })),
           Expanded(
               child: ListView.builder(
                   itemCount: historicoP.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return ListTile(title: Text(historicoP[index]));
+                    if (index == 0) {
+                      return Column(
+                        children: [
+                          // The header
+                          Container(
+                            child: Text('Pressão Atmosférica (atm)',
+                                style: TextStyle(fontWeight: FontWeight.w500)),
+                          ),
+
+                          // The fist list item
+                          ListTile(
+                              title: Text(historicoP[index],
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w500)))
+                        ],
+                      );
+                    }
+                    // If index != 0
+                    return ListTile(
+                        title: Text(historicoL[index],
+                            style: TextStyle(fontWeight: FontWeight.w500)));
                   })),
           Expanded(
               child: ListView.builder(
                   itemCount: historicoT.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return ListTile(title: Text(historicoT[index]));
+                    if (index == 0) {
+                      return Column(
+                        children: [
+                          // The header
+                          Container(
+                            child: Text('Temperatura (°C)',
+                                style: TextStyle(fontWeight: FontWeight.w500)),
+                          ),
+
+                          // The fist list item
+                          ListTile(
+                              title: Text(historicoT[index],
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w500)))
+                        ],
+                      );
+                    }
+                    // If index != 0
+                    return ListTile(
+                        title: Text(historicoT[index],
+                            style: TextStyle(fontWeight: FontWeight.w500)));
                   })),
           Expanded(
               child: ListView.builder(
                   itemCount: historicoU.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return ListTile(title: Text(historicoU[index]));
+                    if (index == 0) {
+                      return Column(
+                        children: [
+                          // The header
+                          Container(
+                            child: Text('Umidade (%)',
+                                style: TextStyle(fontWeight: FontWeight.w500)),
+                          ),
+
+                          // The fist list item
+                          ListTile(
+                              title: Text(historicoU[index],
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w500)))
+                        ],
+                      );
+                    }
+                    // If index != 0
+                    return ListTile(
+                        title: Text(historicoU[index],
+                            style: TextStyle(fontWeight: FontWeight.w500)));
                   })),
         ],
       ),
