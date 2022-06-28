@@ -21,10 +21,6 @@
 #define MQTT_PUBLISH_UMID    "medida/umidade"
 #define MQTT_PUBLISH_PRESSAO    "medida/pressaoAtm"
 #define MQTT_PUBLISH_LUMI    "medida/luminosidade"
-#define MQTT_PUBLISH_HIST_TEMP    "historico/temperatura"
-#define MQTT_PUBLISH_HIST_UMID    "historico/umidade"
-#define MQTT_PUBLISH_HIST_PRESSAO    "historico/pressaoAtm"
-#define MQTT_PUBLISH_HIST_LUMI    "historico/luminosidade"
 #define MQTT_PUBLISH_TEMPO    "config/tempo"
 
 
@@ -46,7 +42,7 @@ int menuLocalizacao = 0;
 int menuPosicao = 0;
 int changeInterface = 1;
 
-int configTempo = 1;
+int configTempo = 20;
 int chaveTempo = 0;
 // variaveis para armazenar o nivel logico das chaves que configuram o tempo
 //4 17 27 22 - esses são numeros na placa é necessario trocar para a numeração do wiringPi
@@ -75,7 +71,7 @@ void voltar();
 void confirmar();
 void updateMedidas();
 void updateHistorico();
-float mapValue(float value, int max);
+float mapValue(float value, float max, float offset);
 void remoteUpdateMQTT();
 void updateConfigTempo();
 void updateChaveTempo();
@@ -118,6 +114,7 @@ int main(){
 
     mosq = mosquitto_new(CLIENTID, true, NULL);
     mosquitto_username_pw_set(mosq,USERNAME, PASSWORD);
+	mosquitto_message_callback_set(mosq, on_message);
 
     rc = mosquitto_connect(mosq, MQTT_ADDRESS, 1883, 60);
     if(rc != 0){
@@ -125,7 +122,10 @@ int main(){
         mosquitto_destroy(mosq);
         return -1;
     }
-	mosquitto_message_callback_set(mosq, on_message);
+    mosquitto_subscribe(mosq, NULL, MQTT_PUBLISH_TEMPO, 0);
+    mosquitto_loop_start(mosq);
+
+
     printf("We are now connected to the broker!\n");
     wiringPiSetup();
     lcd = lcdInit(2,16,4,6,31,26,27,28,29,0,0,0,0);
@@ -243,8 +243,8 @@ void voltar(){
 }
 
 void updateMedidas(){
-    luminosidade = mapValue(getLuminosity(), 10);
-    pressao = mapValue(getPressure(), 100);
+    luminosidade = mapValue(getLuminosity(), 10, 0);
+    pressao = mapValue(getPressure(), 11, 3);
     read_dht11_dat();
     temperatura = getTemp();
     umidade = getHumidity();
@@ -300,12 +300,10 @@ int getChaveTempo(){
 
 void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg) {
 	printf("Nova mensagem\n %s: %s\n", msg->topic, (char *) msg->payload);
-    if( strcmp(msg->topic, MQTT_PUBLISH_TEMPO) == 0 ){
-        chaveTempo = atoi(msg->payload);
-        changeInterface = 1;
-    }
+    configTempo = atoi(msg->payload);
+    changeInterface = 1;
 }
 
-float mapValue(float value, int max){
-    return (float) ((value * max) / 3.3);
+float mapValue(float value, float max, float offset){
+    return (float) offset + ((value *( max-offset)) / 3.3);
 }
