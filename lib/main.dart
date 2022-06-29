@@ -153,57 +153,6 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Row(
         children: <Widget>[
           Expanded(
-            child: ListView.builder(
-              itemCount: historicoL.length,
-              itemBuilder: (BuildContext context, int index) {
-                if (index == 0) {
-                  return Column(
-                    children: [
-                      // The header
-                      Container(
-                          child: const Text('',
-                              style: TextStyle(fontWeight: FontWeight.w500))),
-                      const Divider(),
-                      // The fist list item
-                      ListTile(
-                        title: AutoSizeText(
-                          '23/05',
-                          minFontSize: 1,
-                          maxLines: 1,
-                        ),
-                        subtitle: AutoSizeText(
-                          '23:05:20',
-                          minFontSize: 1,
-                          style: TextStyle(fontSize: 30),
-                          maxLines: 1,
-                        ),
-                      )
-                    ],
-                  );
-                }
-                // If index != 0
-                return Column(
-                  children: [
-                    const Divider(),
-                    ListTile(
-                      title: AutoSizeText(
-                        '23/05',
-                        minFontSize: 1,
-                        maxLines: 1,
-                      ),
-                      subtitle: AutoSizeText(
-                        '23:05:20',
-                        minFontSize: 1,
-                        style: TextStyle(fontSize: 30),
-                        maxLines: 1,
-                      ),
-                    )
-                  ],
-                );
-              },
-            ),
-          ),
-          Expanded(
               child: ListView.builder(
                   itemCount: historicoL.length,
                   itemBuilder: (BuildContext context, int index) {
@@ -221,16 +170,40 @@ class _MyHomePageState extends State<MyHomePage> {
                             title: Text(historicoL[index],
                                 textAlign: TextAlign.center),
                           ),
+                          ListTile(
+                            title: AutoSizeText(
+                              '23/05',
+                              minFontSize: 1,
+                              maxLines: 1,
+                            ),
+                            subtitle: AutoSizeText(
+                              '23:05:20',
+                              minFontSize: 1,
+                              maxLines: 1,
+                            ),
+                          ),
                         ],
                       );
                     }
                     // If index != 0
                     return Column(
                       children: [
+                        const Divider(),
                         ListTile(
                           title: Text(historicoL[index],
-                              style: TextStyle(fontWeight: FontWeight.w500),
                               textAlign: TextAlign.center),
+                        ),
+                        ListTile(
+                          title: AutoSizeText(
+                            '23/05',
+                            minFontSize: 1,
+                            maxLines: 1,
+                          ),
+                          subtitle: AutoSizeText(
+                            '23:05:20',
+                            minFontSize: 1,
+                            maxLines: 1,
+                          ),
                         ),
                       ],
                     );
@@ -254,15 +227,40 @@ class _MyHomePageState extends State<MyHomePage> {
                             title: Text(historicoP[index],
                                 textAlign: TextAlign.center),
                           ),
+                          ListTile(
+                            title: AutoSizeText(
+                              '23/05',
+                              minFontSize: 1,
+                              maxLines: 1,
+                            ),
+                            subtitle: AutoSizeText(
+                              '23:05:20',
+                              minFontSize: 1,
+                              maxLines: 1,
+                            ),
+                          ),
                         ],
                       );
                     }
                     // If index != 0
                     return Column(
                       children: [
+                        const Divider(),
                         ListTile(
                           title: Text(historicoP[index],
                               textAlign: TextAlign.center),
+                        ),
+                        ListTile(
+                          title: AutoSizeText(
+                            '23/05',
+                            minFontSize: 1,
+                            maxLines: 1,
+                          ),
+                          subtitle: AutoSizeText(
+                            '23:05:20',
+                            minFontSize: 1,
+                            maxLines: 1,
+                          ),
                         ),
                       ],
                     );
@@ -286,15 +284,40 @@ class _MyHomePageState extends State<MyHomePage> {
                             title: Text(historicoT[index],
                                 textAlign: TextAlign.center),
                           ),
+                          ListTile(
+                            title: AutoSizeText(
+                              '23/05',
+                              minFontSize: 1,
+                              maxLines: 1,
+                            ),
+                            subtitle: AutoSizeText(
+                              '23:05:20',
+                              minFontSize: 1,
+                              maxLines: 1,
+                            ),
+                          ),
                         ],
                       );
                     }
                     // If index != 0
                     return Column(
                       children: [
+                        const Divider(),
                         ListTile(
                           title: Text(historicoT[index],
                               textAlign: TextAlign.center),
+                        ),
+                        ListTile(
+                          title: AutoSizeText(
+                            '23/05',
+                            minFontSize: 1,
+                            maxLines: 1,
+                          ),
+                          subtitle: AutoSizeText(
+                            '23:05:20',
+                            minFontSize: 1,
+                            maxLines: 1,
+                          ),
                         ),
                       ],
                     );
@@ -318,15 +341,40 @@ class _MyHomePageState extends State<MyHomePage> {
                             title: Text(historicoU[index],
                                 textAlign: TextAlign.center),
                           ),
+                          ListTile(
+                            title: AutoSizeText(
+                              '23/05',
+                              minFontSize: 1,
+                              maxLines: 1,
+                            ),
+                            subtitle: AutoSizeText(
+                              '23:05:20',
+                              minFontSize: 1,
+                              maxLines: 1,
+                            ),
+                          ),
                         ],
                       );
                     }
                     // If index != 0
                     return Column(
                       children: [
+                        const Divider(),
                         ListTile(
                           title: Text(historicoU[index],
                               textAlign: TextAlign.center),
+                        ),
+                        ListTile(
+                          title: AutoSizeText(
+                            '23/05',
+                            minFontSize: 1,
+                            maxLines: 1,
+                          ),
+                          subtitle: AutoSizeText(
+                            '23:05:20',
+                            minFontSize: 1,
+                            maxLines: 1,
+                          ),
                         ),
                       ],
                     );
