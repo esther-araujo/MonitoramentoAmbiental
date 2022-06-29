@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
@@ -32,7 +33,6 @@ String username = "";
 String password = "";
 String response = "";
 int _tempoAtual = 20;
-int _tempoPub = 20;
 
 final client = MqttServerClient(broker, '');
 
@@ -150,236 +150,125 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildHist() {
     return Scaffold(
-      body: Row(
-        children: <Widget>[
-          Expanded(
-              child: ListView.builder(
-                  itemCount: historicoL.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index == 0) {
-                      return Column(
+      body: Container(
+        child: new SingleChildScrollView(
+          child: Column(
+            children: List.generate(
+              historicoL.length,
+              (index) {
+                return Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Column(
                         children: [
                           // The header
-                          Container(
-                              child: const Text('L (i)',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w500))),
-                          const Divider(),
+                          if (index == 0)
+                            Container(
+                                child: const Text(
+                              '   ',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                              textAlign: TextAlign.center,
+                            )),
                           // The fist list item
-                          ListTile(
-                            title: Text(historicoL[index],
-                                textAlign: TextAlign.center),
-                          ),
                           ListTile(
                             title: AutoSizeText(
                               '23/05',
                               minFontSize: 1,
                               maxLines: 1,
+                              textAlign: TextAlign.center,
                             ),
                             subtitle: AutoSizeText(
                               '23:05:20',
                               minFontSize: 1,
+                              textAlign: TextAlign.center,
                               maxLines: 1,
                             ),
                           ),
                         ],
-                      );
-                    }
-                    // If index != 0
-                    return Column(
-                      children: [
-                        const Divider(),
-                        ListTile(
-                          title: Text(historicoL[index],
-                              textAlign: TextAlign.center),
-                        ),
-                        ListTile(
-                          title: AutoSizeText(
-                            '23/05',
-                            minFontSize: 1,
-                            maxLines: 1,
-                          ),
-                          subtitle: AutoSizeText(
-                            '23:05:20',
-                            minFontSize: 1,
-                            maxLines: 1,
-                          ),
-                        ),
-                      ],
-                    );
-                  })),
-          Expanded(
-              child: ListView.builder(
-                  itemCount: historicoP.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index == 0) {
-                      return Column(
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
                         children: [
                           // The header
-                          Container(
-                            child: const Text('PA (atm)',
-                                style: TextStyle(fontWeight: FontWeight.w500)),
-                          ),
+                          if (index == 0)
+                            Container(
+                                child: const Text(
+                              'L (i)',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            )),
                           const Divider(),
 
                           // The fist list item
                           ListTile(
-                            title: Text(historicoP[index],
-                                textAlign: TextAlign.center),
-                          ),
-                          ListTile(
-                            title: AutoSizeText(
-                              '23/05',
-                              minFontSize: 1,
-                              maxLines: 1,
-                            ),
-                            subtitle: AutoSizeText(
-                              '23:05:20',
-                              minFontSize: 1,
-                              maxLines: 1,
-                            ),
-                          ),
+                              title: Text(historicoL[index],
+                                  textAlign: TextAlign.center))
                         ],
-                      );
-                    }
-                    // If index != 0
-                    return Column(
-                      children: [
-                        const Divider(),
-                        ListTile(
-                          title: Text(historicoP[index],
-                              textAlign: TextAlign.center),
-                        ),
-                        ListTile(
-                          title: AutoSizeText(
-                            '23/05',
-                            minFontSize: 1,
-                            maxLines: 1,
-                          ),
-                          subtitle: AutoSizeText(
-                            '23:05:20',
-                            minFontSize: 1,
-                            maxLines: 1,
-                          ),
-                        ),
-                      ],
-                    );
-                  })),
-          Expanded(
-              child: ListView.builder(
-                  itemCount: historicoT.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index == 0) {
-                      return Column(
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
                         children: [
                           // The header
-                          Container(
-                            child: const Text('T (°C)',
-                                style: TextStyle(fontWeight: FontWeight.w500)),
-                          ),
+                          if (index == 0)
+                            Container(
+                                child: const Text(
+                              'PA (atm)',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            )),
                           const Divider(),
 
                           // The fist list item
                           ListTile(
-                            title: Text(historicoT[index],
-                                textAlign: TextAlign.center),
-                          ),
-                          ListTile(
-                            title: AutoSizeText(
-                              '23/05',
-                              minFontSize: 1,
-                              maxLines: 1,
-                            ),
-                            subtitle: AutoSizeText(
-                              '23:05:20',
-                              minFontSize: 1,
-                              maxLines: 1,
-                            ),
-                          ),
+                              title: Text(historicoP[index],
+                                  textAlign: TextAlign.center))
                         ],
-                      );
-                    }
-                    // If index != 0
-                    return Column(
-                      children: [
-                        const Divider(),
-                        ListTile(
-                          title: Text(historicoT[index],
-                              textAlign: TextAlign.center),
-                        ),
-                        ListTile(
-                          title: AutoSizeText(
-                            '23/05',
-                            minFontSize: 1,
-                            maxLines: 1,
-                          ),
-                          subtitle: AutoSizeText(
-                            '23:05:20',
-                            minFontSize: 1,
-                            maxLines: 1,
-                          ),
-                        ),
-                      ],
-                    );
-                  })),
-          Expanded(
-              child: ListView.builder(
-                  itemCount: historicoU.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index == 0) {
-                      return Column(
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
                         children: [
                           // The header
-                          Container(
-                            child: const Text('U (%)',
-                                style: TextStyle(fontWeight: FontWeight.w500)),
-                          ),
+                          if (index == 0)
+                            Container(
+                                child: const Text(
+                              'T (°C)',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            )),
                           const Divider(),
 
                           // The fist list item
                           ListTile(
-                            title: Text(historicoU[index],
-                                textAlign: TextAlign.center),
-                          ),
-                          ListTile(
-                            title: AutoSizeText(
-                              '23/05',
-                              minFontSize: 1,
-                              maxLines: 1,
-                            ),
-                            subtitle: AutoSizeText(
-                              '23:05:20',
-                              minFontSize: 1,
-                              maxLines: 1,
-                            ),
-                          ),
+                              title: Text(historicoT[index],
+                                  textAlign: TextAlign.center))
                         ],
-                      );
-                    }
-                    // If index != 0
-                    return Column(
-                      children: [
-                        const Divider(),
-                        ListTile(
-                          title: Text(historicoU[index],
-                              textAlign: TextAlign.center),
-                        ),
-                        ListTile(
-                          title: AutoSizeText(
-                            '23/05',
-                            minFontSize: 1,
-                            maxLines: 1,
-                          ),
-                          subtitle: AutoSizeText(
-                            '23:05:20',
-                            minFontSize: 1,
-                            maxLines: 1,
-                          ),
-                        ),
-                      ],
-                    );
-                  })),
-        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          // The header
+                          if (index == 0)
+                            Container(
+                                child: const Text(
+                              'U (%)',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            )),
+                          const Divider(),
+
+                          // The fist list item
+                          ListTile(
+                              title: Text(historicoU[index],
+                                  textAlign: TextAlign.center))
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
       ),
     );
   }
