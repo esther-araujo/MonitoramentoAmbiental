@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mqtt_client/mqtt_client.dart';
-import 'dart:io';
+import 'package:numberpicker/numberpicker.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:easy_sidemenu/easy_sidemenu.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +15,9 @@ var historicoL = [];
 var historicoT = [];
 var historicoU = [];
 var historicoP = [];
+var historicoData = [];
 int indexHistorico = 0;
+
 String luz = '0';
 String temperatura = '0';
 String umidade = '0';
@@ -22,10 +26,13 @@ String topicT = "medida/temperatura";
 String topicU = "medida/umidade";
 String topicP = "medida/pressaoAtm";
 String topicL = "medida/luminosidade";
+String configTempo = "config/tempo";
+String hist = "historico";
 String broker = "";
 String username = "";
 String password = "";
 String response = "";
+int _tempoAtual = 20;
 
 final client = MqttServerClient(broker, '');
 
@@ -108,10 +115,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 icon: const Icon(Icons.history),
               ),
               SideMenuItem(
-                priority: 4,
+                priority: 2,
                 title: 'Configurações',
                 onTap: () {
-                  page.jumpToPage(4);
+                  page.jumpToPage(2);
                 },
                 icon: const Icon(Icons.settings),
               ),
@@ -143,124 +150,153 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildHist() {
     return Scaffold(
-      body: Row(
-        children: <Widget>[
-          Expanded(
-              child: ListView.builder(
-                  itemCount: historicoL.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index == 0) {
-                      return Column(
+      body: Container(
+        child: new SingleChildScrollView(
+          child: Column(
+            children: List.generate(
+              historicoL.length,
+              (index) {
+                return Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Column(
                         children: [
                           // The header
-                          Container(child: const Text('L (i)')),
+                          if (index == 0)
+                            Container(
+                                child: const Text(
+                              '   ',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                              textAlign: TextAlign.center,
+                            )),
+                          // The fist list item
+                          ListTile(
+                            title: AutoSizeText(
+                              '23/05',
+                              minFontSize: 1,
+                              maxLines: 1,
+                              textAlign: TextAlign.center,
+                            ),
+                            subtitle: AutoSizeText(
+                              '23:05:20',
+                              minFontSize: 1,
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          // The header
+                          if (index == 0)
+                            Container(
+                                child: const Text(
+                              'L (i)',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            )),
+                          const Divider(),
 
                           // The fist list item
                           ListTile(
                               title: Text(historicoL[index],
-                                  style: TextStyle(fontWeight: FontWeight.w500),
                                   textAlign: TextAlign.center))
                         ],
-                      );
-                    }
-                    // If index != 0
-                    return ListTile(
-                        title: Text(historicoL[index],
-                            style: TextStyle(fontWeight: FontWeight.w500),
-                            textAlign: TextAlign.center));
-                  })),
-          Expanded(
-              child: ListView.builder(
-                  itemCount: historicoP.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index == 0) {
-                      return Column(
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
                         children: [
                           // The header
-                          Container(
-                            child: const Text('PA (atm)',
-                                style: TextStyle(fontWeight: FontWeight.w500)),
-                          ),
+                          if (index == 0)
+                            Container(
+                                child: const Text(
+                              'PA (atm)',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            )),
+                          const Divider(),
 
                           // The fist list item
                           ListTile(
                               title: Text(historicoP[index],
-                                  style: TextStyle(fontWeight: FontWeight.w500),
                                   textAlign: TextAlign.center))
                         ],
-                      );
-                    }
-                    // If index != 0
-                    return ListTile(
-                        title: Text(historicoL[index],
-                            style: TextStyle(fontWeight: FontWeight.w500),
-                            textAlign: TextAlign.center));
-                  })),
-          Expanded(
-              child: ListView.builder(
-                  itemCount: historicoT.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index == 0) {
-                      return Column(
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
                         children: [
                           // The header
-                          Container(
-                            child: const Text('T (°C)',
-                                style: TextStyle(fontWeight: FontWeight.w500)),
-                          ),
+                          if (index == 0)
+                            Container(
+                                child: const Text(
+                              'T (°C)',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            )),
+                          const Divider(),
 
                           // The fist list item
                           ListTile(
                               title: Text(historicoT[index],
-                                  style: TextStyle(fontWeight: FontWeight.w500),
                                   textAlign: TextAlign.center))
                         ],
-                      );
-                    }
-                    // If index != 0
-                    return ListTile(
-                        title: Text(historicoT[index],
-                            style: TextStyle(fontWeight: FontWeight.w500),
-                            textAlign: TextAlign.center));
-                  })),
-          Expanded(
-              child: ListView.builder(
-                  itemCount: historicoU.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index == 0) {
-                      return Column(
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
                         children: [
                           // The header
-                          Container(
-                            child: const Text('U (%)',
-                                style: TextStyle(fontWeight: FontWeight.w500)),
-                          ),
+                          if (index == 0)
+                            Container(
+                                child: const Text(
+                              'U (%)',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            )),
+                          const Divider(),
 
                           // The fist list item
                           ListTile(
                               title: Text(historicoU[index],
-                                  style: TextStyle(fontWeight: FontWeight.w500),
                                   textAlign: TextAlign.center))
                         ],
-                      );
-                    }
-                    // If index != 0
-                    return ListTile(
-                        title: Text(historicoU[index],
-                            style: TextStyle(fontWeight: FontWeight.w500),
-                            textAlign: TextAlign.center));
-                  })),
-        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildSensors() {
+    final builder = MqttClientPayloadBuilder();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+          Text('Intervalo das medições: $_tempoAtual s'),
+          NumberPicker(
+            value: _tempoAtual,
+            minValue: 20,
+            maxValue: 100,
+            step: 20,
+            onChanged: (value) => setState(() {
+              _tempoAtual = value;
+              if (client.connectionStatus!.state ==
+                  MqttConnectionState.connected) {
+                builder.clear();
+                builder.addString(_tempoAtual.toString());
+                client.publishMessage(
+                    configTempo, MqttQos.exactlyOnce, builder.payload!);
+              }
+            }),
+          ),
           SizedBox(
             child: Card(
               child: Column(
@@ -315,6 +351,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildConfig() {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         resizeToAvoidBottomInset: false,
         body: LayoutBuilder(
@@ -335,6 +372,8 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  void _updateTempo() async {}
 
   void _connect() async {
     client.logging(on: false);
@@ -379,8 +418,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
     //o # indica que a inscrição ocorre para todos os topicos dentro de medida/
     const topic = 'medida/#';
+    var historico_array;
+    var historico_data;
     // inscrição
     client.subscribe(topic, MqttQos.atMostOnce);
+    client.subscribe(configTempo, MqttQos.atMostOnce);
+    client.subscribe(hist, MqttQos.atMostOnce);
 
     client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
       final recMess = c![0].payload as MqttPublishMessage;
@@ -395,16 +438,29 @@ class _MyHomePageState extends State<MyHomePage> {
           pressao = pt;
         } else if (c[0].topic == topicU) {
           umidade = pt;
-        } else {
+        } else if (c[0].topic == topicL) {
           luz = pt;
+        } else if (c[0].topic == configTempo) {
+          _tempoAtual = int.parse(pt);
+        } else {
+          historico_array = pt.split(';');
+          for (var i = 0; i < historico_array.length; i++) {
+            historico_data = historico_array.split('|');
+            historicoT[i] = historico_data[0];
+            historicoL[i] = historico_data[1];
+            historicoU[i] = historico_data[2];
+            historicoP[i] = historico_data[3];
+            historicoData[i] = historico_data[4];
+          }
+          print(pt);
         }
       });
       updateHistoric();
       //imprime as listas com historico das medidas para teste
-      print(historicoL);
-      print(historicoU);
-      print(historicoT);
-      print(historicoP);
+      // print(historicoL);
+      // print(historicoU);
+      // print(historicoT);
+      // print(historicoP);
     });
   }
 
@@ -416,7 +472,7 @@ class _MyHomePageState extends State<MyHomePage> {
   /// The unsolicited disconnect callback
   void onDisconnected() {
     setState(() {
-      response = "Desconectado do broker";
+      response = "Erro de conexão";
     });
   }
 
