@@ -38,7 +38,7 @@
 float temperatura, umidade, luminosidade, pressao;
 float temperaturaH[10], umidadeH[10], luminosidadeH[10], pressaoH[10];
 char dataH[10][20], horaH[10][20];
-char historico[420];
+char historico[500];
 int historicoIndex = 0;
 int historicoQtd = 0;
 
@@ -162,7 +162,7 @@ int main(){
 }
 
 void getHistorico(){
-    char historicoi[42];
+    char historicoi[50];
     sprintf(historico,"");
     unsigned int index;
     for(index=0; index<historicoQtd; index++){
