@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
@@ -11,11 +10,12 @@ void main() {
 }
 
 var pongCount = 0; // Pong counter
-var historicoL = [];
-var historicoT = [];
-var historicoU = [];
-var historicoP = [];
-var historicoData = [];
+List historicoL = [];
+List historicoT = [];
+List historicoU = [];
+List historicoP = [];
+List historicoData = [];
+List historicoHora = [];
 int indexHistorico = 0;
 
 String luz = '0';
@@ -172,13 +172,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           // The fist list item
                           ListTile(
                             title: AutoSizeText(
-                              '23/05',
+                              historicoData[index],
                               minFontSize: 1,
                               maxLines: 1,
                               textAlign: TextAlign.center,
                             ),
                             subtitle: AutoSizeText(
-                              '23:05:20',
+                              historicoHora[index],
                               minFontSize: 1,
                               textAlign: TextAlign.center,
                               maxLines: 1,
@@ -201,8 +201,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
                           // The fist list item
                           ListTile(
-                              title: Text(historicoL[index],
-                                  textAlign: TextAlign.center))
+                            title: AutoSizeText(
+                              historicoL[index],
+                              minFontSize: 1,
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -220,8 +225,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
                           // The fist list item
                           ListTile(
-                              title: Text(historicoP[index],
-                                  textAlign: TextAlign.center))
+                            title: AutoSizeText(
+                              historicoP[index],
+                              minFontSize: 1,
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -239,8 +249,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
                           // The fist list item
                           ListTile(
-                              title: Text(historicoT[index],
-                                  textAlign: TextAlign.center))
+                            title: AutoSizeText(
+                              historicoT[index],
+                              minFontSize: 1,
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -258,8 +273,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
                           // The fist list item
                           ListTile(
-                              title: Text(historicoU[index],
-                                  textAlign: TextAlign.center))
+                            title: AutoSizeText(
+                              historicoU[index],
+                              minFontSize: 1,
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -418,8 +438,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     //o # indica que a inscrição ocorre para todos os topicos dentro de medida/
     const topic = 'medida/#';
-    var historico_array;
-    var historico_data;
+    List historico_array;
+    List historico_data;
     // inscrição
     client.subscribe(topic, MqttQos.atMostOnce);
     client.subscribe(configTempo, MqttQos.atMostOnce);
@@ -444,23 +464,25 @@ class _MyHomePageState extends State<MyHomePage> {
           _tempoAtual = int.parse(pt);
         } else {
           historico_array = pt.split(';');
+          historicoT.clear();
+          historicoL.clear();
+          historicoU.clear();
+          historicoP.clear();
+          historicoData.clear();
+          historicoHora.clear();
           for (var i = 0; i < historico_array.length; i++) {
-            historico_data = historico_array.split('|');
-            historicoT[i] = historico_data[0];
-            historicoL[i] = historico_data[1];
-            historicoU[i] = historico_data[2];
-            historicoP[i] = historico_data[3];
-            historicoData[i] = historico_data[4];
+            if (historico_array[i] != "") {
+              historico_data = historico_array[i].split('|');
+              historicoT.add(historico_data[0]);
+              historicoL.add(historico_data[1]);
+              historicoU.add(historico_data[2]);
+              historicoP.add(historico_data[3]);
+              historicoData.add(historico_data[4]);
+              historicoHora.add(historico_data[5]);
+            }
           }
-          print(pt);
         }
       });
-      updateHistoric();
-      //imprime as listas com historico das medidas para teste
-      // print(historicoL);
-      // print(historicoU);
-      // print(historicoT);
-      // print(historicoP);
     });
   }
 
