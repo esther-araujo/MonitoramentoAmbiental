@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <wiringPi.h>
+#include <time.h>
+#include <unistd.h>
 #include <lcd.h>
 #include "ads/ads1115_rpi.h"
 #include "ads/ads1115_rpi.c"
@@ -22,6 +24,7 @@
 #define MQTT_PUBLISH_PRESSAO    "medida/pressaoAtm"
 #define MQTT_PUBLISH_LUMI    "medida/luminosidade"
 #define MQTT_PUBLISH_TEMPO    "config/tempo"
+#define MQTT_PUBLISH_HISTORICO   "historico"
 
 
 
@@ -34,6 +37,8 @@
 
 float temperatura, umidade, luminosidade, pressao;
 float temperaturaH[10], umidadeH[10], luminosidadeH[10], pressaoH[10];
+char dataH[10][20], horaH[10][20];
+char historico[420];
 int historicoIndex = 0;
 int historicoQtd = 0;
 
@@ -41,8 +46,8 @@ int lcd;
 int menuLocalizacao = 0;
 int menuPosicao = 0;
 int changeInterface = 1;
-
-int configTempo = 20;
+int menuHistorico = 0;
+int configTempo = 5;
 int chaveTempo = 0;
 // variaveis para armazenar o nivel logico das chaves que configuram o tempo
 //4 17 27 22 - esses são numeros na placa é necessario trocar para a numeração do wiringPi
@@ -57,7 +62,7 @@ char menu3nivel = '-';
 char menuOpcoes[3][32] = {
     "1: Acompanhar em tempo real",
     "2: Historico",
-    "3: Configurar tempo"
+    "3: Configurar   tempo"
 };
 
 int rc;
@@ -77,7 +82,7 @@ void updateConfigTempo();
 void updateChaveTempo();
 int getChaveTempo();
 void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message);
-
+void getHistorico();
 
 PI_THREAD (medidasThread)
 {
@@ -104,6 +109,9 @@ void remoteUpdateMQTT(){
         mosquitto_publish(mosq, NULL, MQTT_PUBLISH_UMID , strlen(umid), umid, 0, false);
         mosquitto_publish(mosq, NULL, MQTT_PUBLISH_PRESSAO , strlen(pressaoAtm), pressaoAtm, 0, false);
         mosquitto_publish(mosq, NULL, MQTT_PUBLISH_LUMI , strlen(luz), luz, 0, false);
+        
+        //printf("historico: %s\n", historico);
+        //mosquitto_publish(mosq, NULL, MQTT_PUBLISH_HISTORICO , strlen(historico), historico, 0, false);
     }
 
 }
@@ -153,6 +161,18 @@ int main(){
     return 0;
 }
 
+void getHistorico(){
+    char historicoi[42];
+    sprintf(historico,"");
+    unsigned int index;
+    for(index=0; index<historicoQtd; index++){
+        sprintf(historicoi, "%.2f|%.2f|%.2f|%.2f|%s|%s;", 
+            temperaturaH[index], luminosidadeH[index], umidadeH[index], pressaoH[index], dataH[index], horaH[index]);
+        strcat(historico, historicoi);
+        printf("%d/%d: %s\n", index, historicoQtd, historicoi);
+    }
+}
+
 void resetLcd(int lcd){
     lcdClear(lcd);
     lcdPosition(lcd, 0, 0);
@@ -167,11 +187,17 @@ void printMedidas(){
 }
 
 void printHistorico(){
-
-    resetLcd(lcd);
-    lcdPrintf(lcd,"%.1f C | %.1f I", temperaturaH[historicoIndex], luminosidadeH[historicoIndex] );
-    lcdPosition(lcd, 0, 1);
-    lcdPrintf(lcd,"%.1f U | %.1f Pa", umidadeH[historicoIndex], pressaoH[historicoIndex] );
+    if(menuHistorico){ // 1 para exibir medidas
+        resetLcd(lcd);
+        lcdPrintf(lcd,"%.1f C | %.1f I %d", temperaturaH[historicoIndex], luminosidadeH[historicoIndex], historicoIndex );
+        lcdPosition(lcd, 0, 1);
+        lcdPrintf(lcd,"%.1f U | %.1f Pa", umidadeH[historicoIndex], pressaoH[historicoIndex] );
+    }else{ // 0 para exibir data e hora
+        resetLcd(lcd);
+        lcdPrintf(lcd,"%s     %d", dataH[historicoIndex], historicoIndex);
+        lcdPosition(lcd, 0, 1);
+        lcdPrintf(lcd, "%s", horaH[historicoIndex] );
+    }
 }
 
 void menu(){
@@ -222,12 +248,16 @@ void proximo(){
 void confirmar(){
     if (menuLocalizacao == 0) {
         menuLocalizacao = menuPosicao+1;
+        menuHistorico=0; // exibe data e hora por padrão
     }
-    else if (menuLocalizacao == 1) {// 
-        updateMedidas();//quando estiver exibindo as medidas atuais o botão confirmar força a atualização das medidas
+    else if (menuLocalizacao == 1) { //quando estiver exibindo as medidas atuais o botão confirmar força a atualização das medidas
+        updateMedidas();
     }
-    else if (menuLocalizacao == 3) {
-        updateConfigTempo();//confirma a atualização do tempo e publica a mesma no topico MQTT
+    else if (menuLocalizacao == 2) { // altera exibição no historico de data e hora para medidas ou vice-versa.
+        menuHistorico = 1 - menuHistorico;
+    }
+    else if (menuLocalizacao == 3) { //confirma a atualização do tempo e publica a mesma no topico MQTT
+        updateConfigTempo();
     }
     changeInterface = 1;
 }
@@ -253,16 +283,28 @@ void updateMedidas(){
 }
 
 void updateHistorico(){
-    for(int i=0;i<historicoQtd-1;i++){
-        temperaturaH[i+1] = temperaturaH[i];
-        umidadeH[i+1] = umidadeH[i];
-        pressaoH[i+1] = pressaoH[i];
-        luminosidadeH[i+1] = luminosidadeH[i];
+    time_t tempo;
+    time(&tempo);
+    struct tm *tempo0 = localtime(&tempo);
+
+    for(int i=historicoQtd-1; i>0; i--){
+        temperaturaH[i] = temperaturaH[i-1];
+        umidadeH[i] = umidadeH[i-1];
+        pressaoH[i] = pressaoH[i-1];
+        luminosidadeH[i] = luminosidadeH[i-1];
+        sprintf(dataH[i], "%s", dataH[i-1]);
+        sprintf(horaH[i], "%s", horaH[i-1]);
     }
     temperaturaH[0] = temperatura; 
     umidadeH[0] = umidade; 
     pressaoH[0] = pressao; 
     luminosidadeH[0] = luminosidade; 
+    sprintf(dataH[0], "%02d/%02d/%02d", tempo0->tm_mday, tempo0->tm_mon+1, 1900+tempo0->tm_year);
+    sprintf(horaH[0], "%02d:%02d:%02d", tempo0->tm_hour, tempo0->tm_min, tempo0->tm_sec);
+    getHistorico();
+    printf("historico: %s\n", historico);
+    mosquitto_publish(mosq, NULL, MQTT_PUBLISH_HISTORICO , strlen(historico), historico, 0, false);
+    
     if(historicoQtd < 10) 
         historicoQtd++;
 }
