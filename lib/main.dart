@@ -4,6 +4,7 @@ import 'package:numberpicker/numberpicker.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:easy_sidemenu/easy_sidemenu.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'dart:math';
 
 void main() {
   runApp(const MyApp());
@@ -409,9 +410,10 @@ class _MyHomePageState extends State<MyHomePage> {
     client.onSubscribed = onSubscribed;
 
     client.pongCallback = pong;
-
+    var rnd = new Random();
+    var clientId = rnd.nextInt(200);
     final connMess = MqttConnectMessage()
-        .withClientIdentifier('Mqtt_MyClientUniqueId')
+        .withClientIdentifier(clientId.toString())
         .withWillTopic(
             'willtopic') // If you set this you must set a will message
         .withWillMessage('My Will message')
