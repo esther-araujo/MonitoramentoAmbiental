@@ -514,22 +514,6 @@ class _MyHomePageState extends State<MyHomePage> {
     print('EXAMPLE::Ping response client callback invoked');
     pongCount++;
   }
-
-  void updateHistoric() {
-    if (historicoL.length < 10) {
-      historicoL.add(luz);
-      historicoT.add(temperatura);
-      historicoU.add(umidade);
-      historicoP.add(pressao);
-    } else {
-      historicoL[indexHistorico] = luz;
-      historicoT[indexHistorico] = temperatura;
-      historicoU[indexHistorico] = umidade;
-      historicoP[indexHistorico] = pressao;
-      indexHistorico++;
-      if (indexHistorico == 10) indexHistorico = 0;
-    }
-  }
 }
 
 class MyCustomForm extends StatelessWidget {
