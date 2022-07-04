@@ -170,17 +170,16 @@ class _MyHomePageState extends State<MyHomePage> {
                               style: TextStyle(fontWeight: FontWeight.w500),
                               textAlign: TextAlign.center,
                             )),
-                          // The fist list item
                           ListTile(
                             title: AutoSizeText(
                               historicoData[index],
-                              minFontSize: 1,
+                              minFontSize: 10,
                               maxLines: 1,
                               textAlign: TextAlign.center,
                             ),
                             subtitle: AutoSizeText(
                               historicoHora[index],
-                              minFontSize: 1,
+                              minFontSize: 7,
                               textAlign: TextAlign.center,
                               maxLines: 1,
                             ),
@@ -200,11 +199,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             )),
                           const Divider(),
 
-                          // The fist list item
                           ListTile(
                             title: AutoSizeText(
                               historicoL[index],
-                              minFontSize: 1,
+                              minFontSize: 11,
                               textAlign: TextAlign.center,
                               maxLines: 1,
                             ),
@@ -224,11 +222,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             )),
                           const Divider(),
 
-                          // The fist list item
                           ListTile(
                             title: AutoSizeText(
                               historicoP[index],
-                              minFontSize: 1,
+                              minFontSize: 11,
                               textAlign: TextAlign.center,
                               maxLines: 1,
                             ),
@@ -248,11 +245,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             )),
                           const Divider(),
 
-                          // The fist list item
                           ListTile(
                             title: AutoSizeText(
                               historicoT[index],
-                              minFontSize: 1,
+                              minFontSize: 11,
                               textAlign: TextAlign.center,
                               maxLines: 1,
                             ),
@@ -272,11 +268,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             )),
                           const Divider(),
 
-                          // The fist list item
                           ListTile(
                             title: AutoSizeText(
                               historicoU[index],
-                              minFontSize: 1,
+                              minFontSize: 11,
                               textAlign: TextAlign.center,
                               maxLines: 1,
                             ),
