@@ -93,19 +93,16 @@ PI_THREAD (medidasThread)
 void remoteUpdateMQTT(){
 
     char temp[10], umid[10], luz[10], pressaoAtm[10];
-    int read_dht;
+    //formatando medições para envio no Broker MQTT
     sprintf(temp, "%.2f", temperatura);
     sprintf(umid, "%.2f", umidade);
     sprintf(luz, "%.2f", luminosidade);
     sprintf(pressaoAtm, "%.2f", pressao);
 
-    
-    if(read_dht!=-1){
-        mosquitto_publish(mosq, NULL, MQTT_PUBLISH_TEMP , strlen(temp), temp, 0, false);
-        mosquitto_publish(mosq, NULL, MQTT_PUBLISH_UMID , strlen(umid), umid, 0, false);
-        mosquitto_publish(mosq, NULL, MQTT_PUBLISH_PRESSAO , strlen(pressaoAtm), pressaoAtm, 0, false);
-        mosquitto_publish(mosq, NULL, MQTT_PUBLISH_LUMI , strlen(luz), luz, 0, false);
-    }
+    mosquitto_publish(mosq, NULL, MQTT_PUBLISH_TEMP , strlen(temp), temp, 0, false);
+    mosquitto_publish(mosq, NULL, MQTT_PUBLISH_UMID , strlen(umid), umid, 0, false);
+    mosquitto_publish(mosq, NULL, MQTT_PUBLISH_PRESSAO , strlen(pressaoAtm), pressaoAtm, 0, false);
+    mosquitto_publish(mosq, NULL, MQTT_PUBLISH_LUMI , strlen(luz), luz, 0, false);
 
 }
 
@@ -157,11 +154,15 @@ int main(){
         printf("Erro ao iniciar a thread.");
     }
 
-    menu();
+    menu();//a função menu exibe a interface homem-maquina nas raps e está em loop infinito
 
     return 0;
 }
 
+/**
+ * Função que escreve todas as informações do historico em uma unica string para envio no Broker MQTT
+ * A string é formatada num padrão especifico que é reconhecido no aplicativo.
+ */
 void getHistorico(){
     char historicoi[50];
     sprintf(historico,"");
@@ -174,11 +175,17 @@ void getHistorico(){
     }
 }
 
+/**
+ * Função auxiliar para limpa a tela do LCD e resetar o ponteiro para a posição inicial
+ */
 void resetLcd(int lcd){
     lcdClear(lcd);
     lcdPosition(lcd, 0, 0);
 }
 
+/**
+ * Exibe as medições atuais no sensor LCD
+ */
 void printMedidas(){
 
     resetLcd(lcd);
@@ -187,6 +194,11 @@ void printMedidas(){
     lcdPrintf(lcd,"%.1f U | %.1f Pa", umidade, pressao);
 }
 
+
+/**
+ * Exibe as informações de uma medição do historico no lcd, de acordo o historicoIndex
+ * As medições ou a data e hora podem ser exibidas, a depender da opção do menu, 
+ */
 void printHistorico(){
     if(menuHistorico){ // 1 para exibir medidas
         resetLcd(lcd);
@@ -201,23 +213,29 @@ void printHistorico(){
     }
 }
 
+/**
+ * Função que implementa a interface homem-maquina, as variaveis menuLocalizacao e menuPosicao controlam o que é exibido na rasp.
+ * Essas variaveis são alteradas conforme os botões da rasp são pressionados.
+ * */
 void menu(){
     char mensagemTempo1[16] = "";
     char mensagemTempo2[16] = "";
 
     while(1){
+        // A interface no lcd só é atualizada quando ocorre algum evento/ação, isso retira um efeito do LCD de estar "piscando".
+        // O "piscando" era causado porque a tela do LCD era limpa e a mesma informação era colocada novamente.
         if(changeInterface){
-            if(menuLocalizacao == 0){
+            if(menuLocalizacao == 0){//menu principal
                 resetLcd(lcd);
                 lcdPuts(lcd, menuOpcoes[menuPosicao]);
             }
-            else if (menuLocalizacao == 1){
+            else if (menuLocalizacao == 1){//medidas atuais
                 printMedidas();
             }
-            else if (menuLocalizacao == 2){
+            else if (menuLocalizacao == 2){//historico
                 printHistorico();
             }
-            else if (menuLocalizacao == 3){
+            else if (menuLocalizacao == 3){//configuração do tempo
                 updateChaveTempo();
                 sprintf(mensagemTempo1, "Atual: %d s", configTempo);
                 sprintf(mensagemTempo2, "Chave: %d s", chaveTempo);
@@ -226,26 +244,34 @@ void menu(){
                 lcdPosition(lcd, 0, 1);
                 lcdPuts(lcd, mensagemTempo2);
             }
-            changeInterface = 0;
+            changeInterface = 0;// para que na proxima interação o lcd não seja atualizado sem necessidade
         }
     }
     
 }
 
+/**
+ * Função que é associado ao botão "proximo" e altera o menu de acordo a essa função no contexto atual
+ * O contexto se refere a qual lugar do menu o usuario está visualizando.
+ * */
 void proximo(){
-    if (menuLocalizacao == 2){
+    if (menuLocalizacao == 2){//historico
         historicoIndex++;
         if(historicoIndex >= historicoQtd ){
             historicoIndex = 0;
         }
     }
-    else if (menuLocalizacao == 0) {
+    else if (menuLocalizacao == 0) {//menu principal
         menuPosicao >= 2 ? menuPosicao = 0 : menuPosicao++;
     }
     changeInterface = 1;
 }
 
 
+/**
+ * Função que é associado ao botão "proximo" e altera o menu de acordo a essa função no contexto atual
+ * O contexto se refere a qual lugar do menu o usuario está visualizando.
+ * */
 void confirmar(){
     if (menuLocalizacao == 0) {
         menuLocalizacao = menuPosicao+1;
@@ -264,7 +290,7 @@ void confirmar(){
 }
 
 void voltar(){
-    if(menuLocalizacao == 0){
+    if(menuLocalizacao == 0){//voltar uma opção no menu principal
         menuPosicao <= 0 ? menuPosicao = 2 : menuPosicao--;
     }
     else {
@@ -274,8 +300,8 @@ void voltar(){
 }
 
 void updateMedidas(){
-    luminosidade = mapValue(getLuminosity(), 10, 0);
-    pressao = mapValue(getPressure(), 11, 3);
+    luminosidade = mapValue(getLuminosity(), 10, 0);//mapeando a luminosidade na faixa de 0-10
+    pressao = mapValue(getPressure(), 11, 3);//mapeando a pressão na faixa de 3-11
     read_dht11_dat();
     temperatura = getTemp();
     umidade = getHumidity();
@@ -288,7 +314,7 @@ void updateHistorico(){
     time(&tempo);
     struct tm *tempo0 = localtime(&tempo);
 
-    for(int i=historicoQtd-1; i>0; i--){
+    for(int i=historicoQtd-1; i>0; i--){//movendo as medições anteriores para trás, as novas medições ficam na primeira posição
         temperaturaH[i] = temperaturaH[i-1];
         umidadeH[i] = umidadeH[i-1];
         pressaoH[i] = pressaoH[i-1];
@@ -327,6 +353,9 @@ void updateChaveTempo(){
     changeInterface = 1;
 }
 
+/**
+ * Função que retorna o valor do tempo de acordo as chaves, sendo que a chave de maior valor ativa é priorizada.
+ **/
 int getChaveTempo(){
     if(!digitalRead(chaveT4)){
         return 100;
@@ -340,7 +369,7 @@ int getChaveTempo(){
     if(!digitalRead(chaveT1)){
         return 40;
     }
-    return 20;
+    return 20;//valor default caso nenhuma chave esteja ativa
 }
 
 //Callback - Sempre que uma mensagem é recebida do broker
@@ -350,6 +379,10 @@ void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_messag
     changeInterface = 1;
 }
 
+/**
+ * Função para mapear valores dentro de uma faixa especifica.
+ * Exemplo para a faixa de 10-100, o max deve ser 100 e o offset é definido como 10.
+ * */
 float mapValue(float value, float max, float offset){
     return (float) offset + ((value *( max-offset)) / 3.3);
 }
