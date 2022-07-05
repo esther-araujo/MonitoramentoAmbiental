@@ -1,6 +1,9 @@
-# Problema 3 - MI Sistemas Digitais
-##  Protótipo de um sistema para monitoramento ambiental, incluindo todo o tratamento e controle de sensores analógicos e digitais, bem como uma IHM (Interface Homem-Máquina) para apresentação das informações, incluindo históricos dos dados. O protótipo foi desenvolvido num SBC (Raspberry Pi Zero) que mede temperatura, umidade, pressão atmosférica e luminosidade. A IHM apresenta, em tempo real, as leituras atuais e também permite a visualização do histórico com as 10 últimas medições de cada sensor. 
-## O sistema deve permite o ajuste local e remoto do intervalo de tempo que serão realizadas as medições. No caso da configuração e do monitoramento remoto, é utilizada uma aplicação (Desktop e Android). A aplicação e o SBC se comunicam através do protocolo MQTT.
+<div id="inicio">
+    <h1 id="titulo" align="center">Problema 3 - MI Sistemas Digitais</h1>
+	<p id="descricao" align="justify">Protótipo de um sistema para monitoramento ambiental, incluindo todo o tratamento e controle de sensores analógicos e digitais, bem como uma IHM (Interface Homem-Máquina) para apresentação das informações, incluindo históricos dos dados. O protótipo foi desenvolvido num SBC (Raspberry Pi Zero) que mede temperatura, umidade, pressão atmosférica e luminosidade. A IHM apresenta, em tempo real, as leituras atuais e também permite a visualização do histórico com as 10 últimas medições de cada sensor. 
+</P>
+<p id="descricao" align="justify">O sistema deve permite o ajuste local e remoto do intervalo de tempo que serão realizadas as medições. No caso da configuração e do monitoramento remoto, é utilizada uma aplicação (Desktop e Android). A aplicação e o SBC se comunicam através do protocolo MQTT.</p>
+</div>
 
 <!--ts-->
    * [Sobre](#Sobre)
