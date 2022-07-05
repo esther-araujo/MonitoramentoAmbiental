@@ -30,7 +30,9 @@
 #define MQTT_PUBLISH_HISTORICO   "historico"
 
 #define DHT11PIN 5
+#define DEBOUNCE_DELAY  1
 
+unsigned long int debounce_last_timestamp = 0;
 float temperatura, umidade, luminosidade, pressao;
 float temperaturaH[10], umidadeH[10], luminosidadeH[10], pressaoH[10];
 char dataH[10][20], horaH[10][20];
@@ -76,6 +78,7 @@ void remoteUpdateMQTT();
 void updateConfigTempo();
 void updateChaveTempo();
 int getChaveTempo();
+int debounce();
 void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message);
 void getHistorico();
 
@@ -255,6 +258,10 @@ void menu(){
  * O contexto se refere a qual lugar do menu o usuario está visualizando.
  * */
 void proximo(){
+    if( !debounce() ) {
+        return;
+    }
+
     if (menuLocalizacao == 2){//historico
         historicoIndex++;
         if(historicoIndex >= historicoQtd ){
@@ -273,6 +280,10 @@ void proximo(){
  * O contexto se refere a qual lugar do menu o usuario está visualizando.
  * */
 void confirmar(){
+    if( !debounce() ) {
+        return;
+    }
+
     if (menuLocalizacao == 0) {
         menuLocalizacao = menuPosicao+1;
         menuHistorico=0; // exibe data e hora por padrão
@@ -290,6 +301,9 @@ void confirmar(){
 }
 
 void voltar(){
+    if( !debounce() ) {
+        return;
+    }
     if(menuLocalizacao == 0){//voltar uma opção no menu principal
         menuPosicao <= 0 ? menuPosicao = 2 : menuPosicao--;
     }
@@ -349,6 +363,9 @@ void updateConfigTempo(){
 }
 
 void updateChaveTempo(){
+    // if( !debounce() ) {
+    //     return;
+    // }
     chaveTempo = getChaveTempo();
     changeInterface = 1;
 }
@@ -385,4 +402,17 @@ void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_messag
  * */
 float mapValue(float value, float max, float offset){
     return (float) offset + ((value *( max-offset)) / 3.3);
+}
+
+int debounce(){
+    unsigned long int timestamp = time(NULL);
+    piLock(0);
+
+    if(timestamp - debounce_last_timestamp > DEBOUNCE_DELAY){
+        debounce_last_timestamp = timestamp;
+        piUnlock(0);
+        return 1;
+    }
+    piUnlock(0);
+    return 0;
 }
