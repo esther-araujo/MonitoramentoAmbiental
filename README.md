@@ -17,6 +17,60 @@
 
 ## Como usar
 ### Pré Requisitos
+
+### IHM - Interface Homem Máquina 
+<p>A IHM compõe os seguintes componentes:</p>
+  
+  - Raspberry pi zero 
+  - Protoboard
+  - Chave Dip Switch 4 Vias
+  - 3 Chaves Táctil Push Button
+  - Display LCD
+  - 2 Potenciômetros 
+  - Conversor analógico para digital ADS1115
+  - Sensor DHT11
+  - Resistores
+
+<p align="justify"> 
+  Definimos as 3 chaves push button como botões de voltar, próximo e confirmar, respectivamente. Os botões funcionam com a mesma lógica para os três itens do menu. O Display LCD é usado para exibir as informações ao usuário. 
+</p>
+
+- Voltar: vai para o item anterior do menu
+- Proximo: vai para o próximo item do menu
+- Confirmar: exibe o item do menu selecionado
+
+<h3><p><b>Menu:</b></p></h3> 
+  <div class="row">
+    <img title="#menu1" src="./assets/IHM/menu1.jpg" style="width:33.33%"><img title="#menu2" src="./assets/IHM/menu2.jpg" style="width:33.33%"><img title="#menu3" src="./assets/IHM/menu3.jpg" style="width:33.33%">
+  </div>
+ 
+
+1. Acompanhar em tempo real
+    - Exibe as medidas no display LCD:
+    <p align="center"> 
+      xx.x C | xx.x I <br>
+      xx.x U | xx.x Pa
+    </p>
+
+2. Historico
+    - Exibe as datas das últimas 10 medições, uma por vez, no display LCD.
+    - O botão proximo é usado para navegar entre as datas das medições.
+    <h1 align="center">
+      <img alt="" title="#historicoData" src="./assets/IHM/historicoData0.jpg" />
+    </h1>
+
+    - O botão confirmar é usado para acessar a medição de uma data e horário específico.
+    <h1 align="center">
+      <img alt="" title="#historico" src="./assets/IHM/historico0.jpg" />
+    </h1>
+
+3. Configurar tempo
+    - O Dip Switch de 4 Vias é usado para configurar o tempo em segundos com as opções: 20s, 40s, 60s, 100s, para cada chave respectivamente. O tempo default é de 20s. A opção é selecionada quando a chave está em zero (para cima). 
+    - O botão de confirmar confirma o valor que a chave representa para o tempo atual.
+    <h1 align="center">
+      <img alt="" title="#ConfigTempo" src="./assets/IHM/configTempo40.jpg" />
+    </h1>
+
 ### Aplicativo
 <h3><p><b>Interação com usuário:</b></p></h3>
 	<p align="justify"> 
