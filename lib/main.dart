@@ -389,8 +389,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _updateTempo() async {}
-
   void _connect() async {
     client.logging(on: false);
 
@@ -417,6 +415,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print('EXAMPLE::Mosquitto client connecting....');
     client.connectionMessage = connMess;
 
+    //Conexão do cliente
     try {
       await client.connect(username, password);
     } catch (e) {
@@ -442,6 +441,7 @@ class _MyHomePageState extends State<MyHomePage> {
     client.subscribe(configTempo, MqttQos.atMostOnce);
     client.subscribe(hist, MqttQos.atMostOnce);
 
+    //monitora o recebimento de mensagens pelo cliente
     client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
       final recMess = c![0].payload as MqttPublishMessage;
 
@@ -488,14 +488,14 @@ class _MyHomePageState extends State<MyHomePage> {
     print('EXAMPLE::Subscription confirmed for topic $topic');
   }
 
-  /// The unsolicited disconnect callback
+  /// Callback - Falha na conexãp
   void onDisconnected() {
     setState(() {
       response = "Erro de conexão";
     });
   }
 
-  /// The successful connect callback
+  /// Callback - Sucesso na conexão
   void onConnected() {
     setState(() {
       response = "Conexão com broker ativa";

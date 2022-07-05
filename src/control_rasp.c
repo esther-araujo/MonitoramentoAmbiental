@@ -14,9 +14,12 @@
 // list wiringPi-RPi pins $ gpio readall
 
 // gcc -o file file.c -lwiringPi -lwiringPiDev -lmosquitto
-//Teste com o mosquitto.org
+
+//Configurações do Broker
 #define MQTT_ADDRESS   "10.0.0.101"
 #define CLIENTID       "clientID"  
+#define USERNAME "aluno"
+#define PASSWORD "aluno*123"
 
 /*Topicos de publish e subscribe*/
 #define MQTT_PUBLISH_TEMP    "medida/temperatura"
@@ -25,13 +28,6 @@
 #define MQTT_PUBLISH_LUMI    "medida/luminosidade"
 #define MQTT_PUBLISH_TEMPO    "config/tempo"
 #define MQTT_PUBLISH_HISTORICO   "historico"
-
-
-
-//#define MQTT_SUBSCRIBE_TOPIC   "PBL3/teste"
-//Passar por parâmetro
-#define USERNAME "aluno"
-#define PASSWORD "aluno*123"
 
 #define DHT11PIN 5
 
@@ -55,7 +51,6 @@ int chaveT1 = 7;
 int chaveT2 = 0;
 int chaveT3 = 2;
 int chaveT4 = 3;
-//
 
 char menu2nivel = '*';
 char menu3nivel = '-';
@@ -94,6 +89,7 @@ PI_THREAD (medidasThread)
     }
 }
 
+//Função para atualizar as medições no Broker MQTT
 void remoteUpdateMQTT(){
 
     char temp[10], umid[10], luz[10], pressaoAtm[10];
@@ -109,9 +105,6 @@ void remoteUpdateMQTT(){
         mosquitto_publish(mosq, NULL, MQTT_PUBLISH_UMID , strlen(umid), umid, 0, false);
         mosquitto_publish(mosq, NULL, MQTT_PUBLISH_PRESSAO , strlen(pressaoAtm), pressaoAtm, 0, false);
         mosquitto_publish(mosq, NULL, MQTT_PUBLISH_LUMI , strlen(luz), luz, 0, false);
-        
-        //printf("historico: %s\n", historico);
-        //mosquitto_publish(mosq, NULL, MQTT_PUBLISH_HISTORICO , strlen(historico), historico, 0, false);
     }
 
 }
@@ -120,16 +113,24 @@ void remoteUpdateMQTT(){
 int main(){
     mosquitto_lib_init();
 
+    //Cria uma nova instância do cliente
     mosq = mosquitto_new(CLIENTID, true, NULL);
+
+    //Configura user e senha para o cliente
     mosquitto_username_pw_set(mosq,USERNAME, PASSWORD);
+    
+    //Define o callback da mensagem (é chamada quando uma mensagem é recebida do broker)
 	mosquitto_message_callback_set(mosq, on_message);
 
+    //Conecta no Broker MQTT
     rc = mosquitto_connect(mosq, MQTT_ADDRESS, 1883, 60);
     if(rc != 0){
         printf("Client could not connect to broker! Error Code: %d\n", rc);
         mosquitto_destroy(mosq);
         return -1;
     }
+
+    //Inscreve no tópico tempo (configuração do tempo de medição)
     mosquitto_subscribe(mosq, NULL, MQTT_PUBLISH_TEMPO, 0);
     mosquitto_loop_start(mosq);
 
@@ -303,6 +304,7 @@ void updateHistorico(){
     sprintf(horaH[0], "%02d:%02d:%02d", tempo0->tm_hour, tempo0->tm_min, tempo0->tm_sec);
     getHistorico();
     printf("historico: %s\n", historico);
+    //Publica o histórico completo no broker
     mosquitto_publish(mosq, NULL, MQTT_PUBLISH_HISTORICO , strlen(historico), historico, 0, false);
     
     if(historicoQtd < 10) 
@@ -316,6 +318,7 @@ void updateConfigTempo(){
     changeInterface = 1;
 
     sprintf(charTempo, "%d", configTempo);
+    //Publica a configuração do tempo no broker MQTT
     mosquitto_publish(mosq, NULL, MQTT_PUBLISH_TEMPO , strlen(charTempo), charTempo, 0, false);
 }
 
@@ -340,6 +343,7 @@ int getChaveTempo(){
     return 20;
 }
 
+//Callback - Sempre que uma mensagem é recebida do broker
 void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg) {
 	printf("Nova mensagem\n %s: %s\n", msg->topic, (char *) msg->payload);
     configTempo = atoi(msg->payload);
