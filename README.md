@@ -40,9 +40,12 @@
 - Confirmar: exibe o item do menu selecionado
 
 <h3><p><b>Menu:</b></p></h3> 
-  <div class="row">
-    <img title="#menu1" src="./assets/IHM/menu1.jpg" style="width:33.33%"><img title="#menu2" src="./assets/IHM/menu2.jpg" style="width:33.33%"><img title="#menu3" src="./assets/IHM/menu3.jpg" style="width:33.33%">
-  </div>
+<h1 align="center">
+  <img alt="" width="30%" height="auto" title="#menu1" src="./assets/IHM/menu1.jpg"/>
+  <img alt="" width="30%" height="auto" title="#menu2" src="./assets/IHM/menu2.jpg" />
+  <img alt=""  width="30%" height="auto" title="#menu3" src="./assets/IHM/menu3.jpg"/>
+</h1>
+ 
  
 
 1. Acompanhar em tempo real
@@ -65,7 +68,7 @@
     </h1>
 
 3. Configurar tempo
-    - O Dip Switch de 4 Vias é usado para configurar o tempo em segundos com as opções: 20s, 40s, 60s, 100s, para cada chave respectivamente. O tempo default é de 20s. A opção é selecionada quando a chave está em zero (para cima). 
+    - O Dip Switch de 4 Vias é usado para configurar o tempo em segundos com as opções: 40s, 60s, 80s, 100s, para cada chave respectivamente. O tempo default é de 20s. A opção é selecionada quando a chave está em zero (para cima). 
     - O botão de confirmar confirma o valor que a chave representa para o tempo atual.
     <h1 align="center">
       <img alt="" title="#ConfigTempo" src="./assets/IHM/configTempo40.jpg" />
