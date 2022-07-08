@@ -20,7 +20,7 @@
 ## Instalação
 ```bash
 # Clone este repositório
-$ git clone https://github.com/EstherWI/MonitoramentoRaspberry.git
+git clone https://github.com/EstherWI/MonitoramentoRaspberry.git
 ```
 <p align="justify"> Geramos duas aplicações para o monitoramento e configuração remota do sistema e disponibilizamos os builds neste repositório.</p>
 
@@ -41,17 +41,17 @@ $ git clone https://github.com/EstherWI/MonitoramentoRaspberry.git
 ### Pré Requisitos
 #### Ter instalado a aplicação (Android ou Desktop)
 #### Transferir arquivos da pasta src para a raspberry:
-```$
+```bash
 scp MonitoramentoRaspberry/src pi@[endereço da raspberry]:[filepath desejado]
 ```
 #### Compilar código na raspberry:
-```sh
-$ cd src
-$ make
+```bash
+cd src
+make
 ```
 #### Executar código na raspberry:
-```
-$ ./control_rasp
+```bash
+./control_rasp
 ```
 
 ### IHM - Interface Homem Máquina 
