@@ -40,6 +40,8 @@ git clone https://github.com/EstherWI/MonitoramentoRaspberry.git
 ## Como usar
 ### Pré Requisitos
 #### Ter instalado a aplicação (Android ou Desktop)
+#### Ter instalado as biblioteca Mosquitto e WiringPi na Raspberry
+Nas placas 103 e 106 do laborátório o mosquitto já está instalado.
 #### Transferir arquivos da pasta src para a raspberry:
 ```bash
 scp MonitoramentoRaspberry/src pi@[endereço da raspberry]:[filepath desejado]
