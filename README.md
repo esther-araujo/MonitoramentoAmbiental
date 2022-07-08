@@ -20,26 +20,39 @@
 ## Instalação
 ```bash
 # Clone este repositório
-$ git clone <https://github.com/EstherWI/MonitoramentoRaspberry.git>
+$ git clone https://github.com/EstherWI/MonitoramentoRaspberry.git
 ```
-<p align="justify"> Geramos duas aplicações para o monitoramento e configuração remota do sistema e disponibilizamos os os builds neste repositório.</p>
+<p align="justify"> Geramos duas aplicações para o monitoramento e configuração remota do sistema e disponibilizamos os builds neste repositório.</p>
 
   - Aplicativo Android
   - Desktop Linux
 
-
 ### APK  
   - Acesse a pasta app do projeto
   - Copie o arquivo app-release-G01.apk para um dispositivo android
-  - Abrir o arquivo apk e selecionar a opção do instalador
+  - Abra o arquivo apk e selecionar a opção do instalador
   - O aplicativo de nome flutter_application_1 será instalado no dispositivo
 
 ### Desktop
   - Acesse a pasta app/desktop-linux-g01/bundle do projeto
-  - Abrir o arquivo flutter_application_1 que já pode ser utilizado
+  - Abra o arquivo flutter_application_1 que já pode ser utilizado
 
 ## Como usar
 ### Pré Requisitos
+#### Ter instalado a aplicação (Android ou Desktop)
+#### Transferir arquivos da pasta src para a raspberry:
+```$
+scp MonitoramentoRaspberry/src pi@[endereço da raspberry]:[filepath desejado]
+```
+#### Compilar código na raspberry:
+```sh
+$ cd src
+$ make
+```
+#### Executar código na raspberry:
+```
+$ ./control_rasp
+```
 
 ### IHM - Interface Homem Máquina 
 <p>A IHM compõe os seguintes componentes:</p>
