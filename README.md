@@ -8,12 +8,35 @@
 <!--ts-->
    * [Sobre](#Sobre)
    * [Instalação](#instalacao)
+      * [APK](#apk)
+      * [Desktop](#desktop)
    * [Como usar](#como-usar)
       * [Pre Requisitos](#pre-requisitos)
       * [IHM - Interface Homem Máquina](#ihm)
       * [Aplicativo](#aplicativo)
    * [Testes](#testes)
 <!--te-->
+
+## Instalação
+```bash
+# Clone este repositório
+$ git clone <https://github.com/EstherWI/MonitoramentoRaspberry.git>
+```
+<p align="justify"> Geramos duas aplicações para o monitoramento e configuração remota do sistema e disponibilizamos os os builds neste repositório.</p>
+
+  - Aplicativo Android
+  - Desktop Linux
+
+
+## APK
+
+# Acesse a pasta app do projeto
+# Copie o arquivo app-release-G01.apk para um dispositivo android
+# Abrir o arquivo apk e selecionar a opção do instalador
+
+## Desktop
+# Acesse a pasta app/desktop-linux-g01/bundle do projeto
+# Abrir o arquivo flutter_application_1 
 
 ## Como usar
 ### Pré Requisitos
