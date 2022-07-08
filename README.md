@@ -30,7 +30,7 @@ git clone https://github.com/EstherWI/MonitoramentoRaspberry.git
 ### APK  
   - Acesse a pasta app do projeto
   - Copie o arquivo app-release-G01.apk para um dispositivo android
-  - Abra o arquivo apk e selecionar a opção do instalador
+  - Abra o arquivo apk e selecione a opção do instalador
   - O aplicativo de nome flutter_application_1 será instalado no dispositivo
 
 ### Desktop
