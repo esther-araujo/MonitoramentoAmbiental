@@ -6,7 +6,7 @@
 </div>
 
 <!--ts-->
-   * [Sobre](#Sobre)
+   * [Sobre](#inicio)
    * [Instalação](#instalacao)
       * [APK](#apk)
       * [Desktop](#desktop)
