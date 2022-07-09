@@ -1,5 +1,5 @@
 <div id="inicio">
-    <h1 id="titulo" align="center">Problema 3 - MI Sistemas Digitais</h1>
+    <h1 id="titulo" align="center">Problema 3 - Sistemas Digitais - IoT: A Internet das Coisas</h1>
 	<p id="descricao" align="justify">Protótipo de um sistema para monitoramento ambiental, incluindo todo o tratamento e controle de sensores analógicos e digitais, bem como uma IHM (Interface Homem-Máquina) para apresentação das informações, incluindo históricos dos dados. O protótipo foi desenvolvido num SBC (Raspberry Pi Zero) que mede temperatura, umidade, pressão atmosférica e luminosidade. A IHM apresenta, em tempo real, as leituras atuais e também permite a visualização do histórico com as 10 últimas medições de cada sensor. 
 </P>
 <p id="descricao" align="justify">O sistema permite o ajuste local e remoto do intervalo de tempo que serão realizadas as medições. No caso da configuração e do monitoramento remoto, é utilizada uma aplicação (Desktop e Android). A aplicação e o SBC se comunicam através do protocolo MQTT.</p>
@@ -11,10 +11,9 @@
       * [APK](#apk)
       * [Desktop](#desktop)
    * [Como usar](#como-usar)
-      * [Pre Requisitos](#pre-requisitos)
+      * [Pré Requisitos](#pre-requisitos)
       * [IHM - Interface Homem Máquina](#ihm)
       * [Aplicativo](#aplicativo)
-   * [Testes](#testes)
 <!--te-->
 
 ## Instalação
@@ -40,8 +39,12 @@ git clone https://github.com/EstherWI/MonitoramentoRaspberry.git
 ## Como usar
 ### Pré Requisitos
 #### Ter instalado a aplicação (Android ou Desktop)
-#### Ter instalado as biblioteca Mosquitto e WiringPi na Raspberry
-Nas placas 103 e 106 do laborátório o mosquitto já está instalado.
+#### Ter instalado as bibliotecas Mosquitto e WiringPi na Raspberry
+  - [Mosquitto](https://mosquitto.org/)
+  - [Wiring Pi](http://wiringpi.com/)
+
+Nas placas 103 e 106 do laborátório as bibliotecas já estão instaladas.
+
 #### Transferir arquivos da pasta src para a raspberry:
 ```bash
 scp MonitoramentoRaspberry/src pi@[endereço da raspberry]:[filepath desejado]
@@ -138,10 +141,12 @@ make
 </h1>
 
 ### Smartphone
+<p align="justify"> 
+       Imagens da aplicação rodando em um dispositivo Android.
+<p> 
 <h1 align="center">
   <img alt="" width="20%" height="auto" title="#Hist" src="./assets/APP/Conf.png" />
     <img alt="" width="20%" height="auto" title="#Hist" src="./assets/APP/Sens.png" />
   <img alt=""  width="20%" height="auto" title="#Hist" src="./assets/APP/HistS.png" />
-
 </h1>
  
